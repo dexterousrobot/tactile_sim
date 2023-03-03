@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+<robot name="standard_tactip.urdf">
+
+    <material name="TransparentRed">
+      <color rgba="0.9 0 0.2 0.5"/>
+    </material>
+
+    <link name="tactip_body_link">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+         <mass value="0.25"/>
+         <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+                  <mesh filename="body/tactip_body.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+         <material name="whitish">
+          <color rgba="0.8 0.8 0.8 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+                  <mesh filename="body/tactip_body.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+      </collision>
+    </link>
+
+
+    <link name="tactip_tip_link">
+      <contact>
+        <friction_anchor/>
+        <lateral_friction value="1.0"/>
+      </contact>
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+         <mass value="0.01"/>
+         <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="tip/skin.obj" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="black">
+           <color rgba="0.0 0.0 0.0 1.0"/>
+       </material>
+      </visual>
+      <collision>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+          <mesh filename="tip/core.obj" scale="1 1 1"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="tactip_tip_to_body" type="fixed">
+       <origin rpy="1.57 0 0" xyz="0 0 0.065"/>
+       <axis xyz="0 1 0"/>
+       <parent link="tactip_body_link"/>
+       <child link="tactip_tip_link"/>
+    </joint>
+
+    <!-- TCP -->
+    <link name="tcp_link">
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+          <sphere radius="0.001"/>
+        </geometry>
+         <material name="TransparentRed"/>
+      </visual>
+      <inertial>
+        <mass value="0.0"/>
+        <origin rpy="0.0 0.0 1.57" xyz="0.0 0.0 0.0"/>
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+      </inertial>
+    </link>
+
+    <joint name="tcp_joint" type="fixed">
+      <parent link="tactip_body_link"/>
+      <child link="tcp_link"/>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.085"/>
+    </joint>
+
+
+</robot>

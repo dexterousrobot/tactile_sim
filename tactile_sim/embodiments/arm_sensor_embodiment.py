@@ -3,11 +3,7 @@ import sys
 import numpy as np
 
 from tactile_sim.assets import add_assets_path
-from tactile_sim.robots.arms.mg400.mg400 import MG400
-from tactile_sim.robots.arms.ur5.ur5 import UR5
-from tactile_sim.robots.arms.franka_panda.franka_panda import FrankaPanda
-from tactile_sim.robots.arms.kuka_iiwa.kuka_iiwa import KukaIiwa
-
+from tactile_sim.robots.arms import arm_mapping
 from tactile_sim.sensors.base_tactile_sensor import TactileSensor
 
 
@@ -25,62 +21,34 @@ class ArmSensorEmbodiment:
         self._pb = pb
         self.arm_type = robot_arm_params["type"]
         self.sensor_type = sensor_params["type"]
-        # self.sensor_core = sensor_params["type"]
 
         # load the urdf file
-        self.embodiment_id = self.load_urdf()
+        self.load_urdf()
 
-        if self.arm_type == "ur5":
-            self.arm = UR5(
-                pb, self.embodiment_id, workframe, robot_arm_params['rest_poses'], robot_arm_params['tcp_lims']
-            )
+        # instantiate a robot arm
+        self.arm = arm_mapping[self.arm_type](
+            pb,
+            embodiment_id=self.embodiment_id,
+            workframe=workframe,
+            link_name_to_index=self.link_name_to_index,
+            joint_name_to_index=self.joint_name_to_index,
+            rest_poses=robot_arm_params['rest_poses'],
+            tcp_lims=robot_arm_params['tcp_lims']
+        )
 
-        elif self.arm_type == "franka_panda":
-            self.arm = FrankaPanda(
-                pb, self.embodiment_id, workframe, robot_arm_params['rest_poses'], robot_arm_params['tcp_lims']
-            )
-
-        elif self.arm_type == "kuka_iiwa":
-            self.arm = KukaIiwa(
-                pb, self.embodiment_id, workframe, robot_arm_params['rest_poses'], robot_arm_params['tcp_lims']
-            )
-
-        elif self.arm_type == "mg400":
-            self.arm = MG400(
-                pb, self.embodiment_id, workframe, robot_arm_params['rest_poses'], robot_arm_params['tcp_lims']
-            )
-
-        else:
-            sys.exit("Incorrect arm type specified {}".format(self.arm_type))
-
-        #
-        # # get relevent link ids for turning off collisions, connecting camera, etc
-        # tactile_link_ids = {}
-        # tactile_link_ids['body'] = self.arm.link_name_to_index[self.sensor_name+"_body_link"]
-        # tactile_link_ids['tip'] = self.arm.link_name_to_index[self.sensor_name+"_tip_link"]
-        #
-        # if sensor_type in ["right_angle", 'forward', 'mini_right_angle', 'mini_forward']:
-        #     if self.sensor_name == 'tactip':
-        #         tactile_link_ids['adapter'] = self.arm.link_name_to_index[
-        #             "tactip_adapter_link"
-        #         ]
-        #     elif self.sensor_name in ['digitac', 'digit']:
-        #         print("TODO: Add the adpater link after get it into the URDF")
-        #
-        # # connect the sensor the tactip
-        # self.sensor = TactileSensor(
-        #     pb,
-        #     embodiment_id=self.embodiment_id,
-        #     tactile_link_ids=tactile_link_ids,
-        #     image_size=image_size,
-        #     turn_off_border=turn_off_border,
-        #     sensor_name=sensor_name,
-        #     sensor_type=sensor_type,
-        #     sensor_core=sensor_core,
-        #     sensor_dynamics=sensor_dynamics,
-        #     show_tactile=show_tactile,
-        #     sensor_num=1
-        # )
+        # connect the sensor the tactip
+        self.sensor = TactileSensor(
+            pb,
+            embodiment_id=self.embodiment_id,
+            link_name_to_index=self.link_name_to_index,
+            image_size=sensor_params["image_size"],
+            turn_off_border=sensor_params["turn_off_border"],
+            sensor_type=sensor_params["type"],
+            sensor_core=sensor_params["core"],
+            sensor_dynamics=sensor_params["dynamics"],
+            show_tactile=show_tactile,
+            sensor_num=1
+        )
 
     def load_urdf(self):
         """
@@ -91,15 +59,37 @@ class ArmSensorEmbodiment:
         self.base_orn = self._pb.getQuaternionFromEuler(self.base_rpy)
         asset_name = os.path.join(
             "embodiment_assets",
-            self.arm_type,
-            self.sensor_type.split('_')[-1],
-            self.arm_type + "_with_" + self.sensor_type + ".urdf",
+            "combined_urdfs",
+            self.arm_type + "_" + self.sensor_type + ".urdf",
         )
-        embodiment_id = self._pb.loadURDF(
+
+        self.embodiment_id = self._pb.loadURDF(
             add_assets_path(asset_name), self.base_pos, self.base_orn, useFixedBase=True
         )
 
-        return embodiment_id
+        # create dicts for mapping link/joint names to corresponding indices
+        self.num_joints, self.link_name_to_index, self.joint_name_to_index = self.create_link_joint_mappings(
+            self.embodiment_id)
+
+        # get the link and tcp IDs
+        self.ee_link_id = self.link_name_to_index["ee_link"]
+        self.tcp_link_id = self.link_name_to_index["tcp_link"]
+
+    def create_link_joint_mappings(self, urdf_id):
+
+        num_joints = self._pb.getNumJoints(urdf_id)
+
+        # pull relevent info for controlling the robot
+        joint_name_to_index = {}
+        link_name_to_index = {}
+        for i in range(num_joints):
+            info = self._pb.getJointInfo(urdf_id, i)
+            joint_name = info[1].decode("utf-8")
+            link_name = info[12].decode("utf-8")
+            joint_name_to_index[joint_name] = i
+            link_name_to_index[link_name] = i
+
+        return num_joints, link_name_to_index, joint_name_to_index
 
     def reset(self, reset_TCP_pos, reset_TCP_rpy):
         """
@@ -113,7 +103,7 @@ class ArmSensorEmbodiment:
         self.blocking_move(max_steps=1000, constant_vel=0.001)
 
     def full_reset(self):
-        self.load_robot()
+        self.load_urdf()
         self.sensor.turn_off_collisions()
 
     def step_sim(self):
@@ -248,3 +238,55 @@ class ArmSensorEmbodiment:
 
     def get_tactile_observation(self):
         return self.sensor.get_observation()
+
+    def draw_ee(self, lifetime=0.1):
+        self._pb.addUserDebugLine(
+            [0, 0, 0],
+            [0.1, 0, 0],
+            [1, 0, 0],
+            parentObjectUniqueId=self.embodiment_id,
+            parentLinkIndex=self.ee_link_id,
+            lifeTime=lifetime,
+        )
+        self._pb.addUserDebugLine(
+            [0, 0, 0],
+            [0, 0.1, 0],
+            [0, 1, 0],
+            parentObjectUniqueId=self.embodiment_id,
+            parentLinkIndex=self.ee_link_id,
+            lifeTime=lifetime,
+        )
+        self._pb.addUserDebugLine(
+            [0, 0, 0],
+            [0, 0, 0.1],
+            [0, 0, 1],
+            parentObjectUniqueId=self.embodiment_id,
+            parentLinkIndex=self.ee_link_id,
+            lifeTime=lifetime,
+        )
+
+    def draw_tcp(self, lifetime=0.1):
+        self._pb.addUserDebugLine(
+            [0, 0, 0],
+            [0.1, 0, 0],
+            [1, 0, 0],
+            parentObjectUniqueId=self.embodiment_id,
+            parentLinkIndex=self.tcp_link_id,
+            lifeTime=lifetime,
+        )
+        self._pb.addUserDebugLine(
+            [0, 0, 0],
+            [0, 0.1, 0],
+            [0, 1, 0],
+            parentObjectUniqueId=self.embodiment_id,
+            parentLinkIndex=self.tcp_link_id,
+            lifeTime=lifetime,
+        )
+        self._pb.addUserDebugLine(
+            [0, 0, 0],
+            [0, 0, 0.1],
+            [0, 0, 1],
+            parentObjectUniqueId=self.embodiment_id,
+            parentLinkIndex=self.tcp_link_id,
+            lifeTime=lifetime,
+        )

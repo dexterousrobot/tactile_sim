@@ -4,14 +4,16 @@ from tactile_sim.robots.arms.base_robot_arm import BaseRobotArm
 
 
 class MG400(BaseRobotArm):
-    def __init__(self, pb, embodiment_id, workframe, rest_poses, tcp_lims):
-        super(MG400, self).__init__(pb, embodiment_id, workframe, rest_poses, tcp_lims)
+    def __init__(self, pb, embodiment_id, workframe, link_name_to_index, joint_name_to_index, rest_poses, tcp_lims):
+        super(MG400, self).__init__(
+            pb, embodiment_id, workframe, link_name_to_index, joint_name_to_index, rest_poses, tcp_lims
+        )
 
         # set info specific to arm
         self.setup_mg400_info()
         self.robot_type = 'MG400'
-        # reset the arm to rest poses
 
+        # reset the arm to rest poses
         self.reset()
 
     def setup_mg400_info(self):
@@ -36,36 +38,20 @@ class MG400(BaseRobotArm):
             "j4_2",
         ]
 
-        # pull relevent info for controlling the robot (could pull limits and ranges here if needed)
-        self.joint_name_to_index = {}
-        self.link_name_to_index = {}
-        for i in range(self.num_joints):
-            info = self._pb.getJointInfo(self.embodiment_id, i)
-            joint_name = info[1].decode("utf-8")
-            link_name = info[12].decode("utf-8")
-            self.joint_name_to_index[joint_name] = i
-            self.link_name_to_index[link_name] = i
-
-        # get the link and tcp IDs
-        self.EE_link_id = self.link_name_to_index["ee_link"]
-        self.TCP_link_id = self.link_name_to_index["tcp_link"]
-
         # get the control and calculate joint ids in list form, useful for pb array methods
-        self.control_joint_ids = [
-            self.joint_name_to_index[name] for name in self.control_joint_names
-        ]
+        self.control_joint_ids = [self.joint_name_to_index[name] for name in self.control_joint_names]
         self.num_control_dofs = len(self.control_joint_ids)
 
-        self.link_4_1_id = self.link_name_to_index["link4_1"]
-        self.link_4_2_id = self.link_name_to_index["link4_2"]
-        self.link_5_id = self.link_name_to_index["link5"]
-
-        self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.link_4_1_id, 0, 0)
-        self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.link_4_2_id, 0, 0)
-        self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.link_5_id, 0, 0)
-        self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.TCP_link_id, 0, 0)
-        self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.EE_link_id, 0, 0)
+        # self.link_4_1_id = self.link_name_to_index["link4_1"]
+        # self.link_4_2_id = self.link_name_to_index["link4_2"]
+        # self.link_5_id = self.link_name_to_index["link5"]
         #
+        # self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.link_4_1_id, 0, 0)
+        # self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.link_4_2_id, 0, 0)
+        # self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.link_5_id, 0, 0)
+        # self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.tcp_link_id, 0, 0)
+        # self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.ee_link_id, 0, 0)
+
         # self.print_joint_pos_vel()
         # self.draw_TCP()
 
@@ -92,7 +78,7 @@ class MG400(BaseRobotArm):
         # used to map joing velocities to TCP velocities
         jac_t, jac_r = self._pb.calculateJacobian(
             self.embodiment_id,
-            self.TCP_link_id,
+            self.tcp_link_id,
             [0, 0, 0],
             q,
             qd,
@@ -113,6 +99,7 @@ class MG400(BaseRobotArm):
             joint_poses[-2] = -joint_poses[1]
             joint_poses[-1] = joint_poses[1] + joint_poses[2]
             req_joint_vels = tuple(joint_poses)
+
         # apply joint space velocities
         self._pb.setJointMotorControlArray(
             self.embodiment_id,
@@ -151,7 +138,7 @@ class MG400(BaseRobotArm):
         # get joint positions using inverse kinematics
         joint_poses = self._pb.calculateInverseKinematics(
             self.embodiment_id,
-            self.TCP_link_id,
+            self.tcp_link_id,
             target_pos,
             target_orn,
             restPoses=self.rest_poses,
@@ -192,10 +179,11 @@ class MG400(BaseRobotArm):
         # transform from work_frame to world_frame
         target_pos, target_rpy = self.workframe_to_worldframe(target_pos, target_rpy)
         target_orn = np.array(self._pb.getQuaternionFromEuler(target_rpy))
+
         # get target joint poses through IK
         joint_poses = self._pb.calculateInverseKinematics(
             self.embodiment_id,
-            self.TCP_link_id,
+            self.tcp_link_id,
             target_pos,
             target_orn,
             restPoses=self.rest_poses,

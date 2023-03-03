@@ -4,11 +4,18 @@ import time
 
 
 class BaseRobotArm:
-    def __init__(self, pb, embodiment_id, workframe, rest_poses, tcp_lims):
+    def __init__(self, pb, embodiment_id, workframe, link_name_to_index, joint_name_to_index, rest_poses, tcp_lims):
 
         self._pb = pb
         self.rest_poses = rest_poses  # default joint pose for ur5
         self.embodiment_id = embodiment_id
+        self.num_joints = self._pb.getNumJoints(embodiment_id)
+        self.link_name_to_index = link_name_to_index
+        self.joint_name_to_index = joint_name_to_index
+
+        # get the link and tcp IDs
+        self.ee_link_id = self.link_name_to_index["ee_link"]
+        self.tcp_link_id = self.link_name_to_index["tcp_link"]
 
         # set up the work frame
         self.set_workframe(workframe)
@@ -139,7 +146,7 @@ class BaseRobotArm:
         """
         tcp_state = self._pb.getLinkState(
             self.embodiment_id,
-            self.TCP_link_id,
+            self.tcp_link_id,
             computeLinkVelocity=True,
             computeForwardKinematics=False,
         )
@@ -200,7 +207,7 @@ class BaseRobotArm:
         # get target joint poses through IK
         joint_poses = self._pb.calculateInverseKinematics(
             self.embodiment_id,
-            self.TCP_link_id,
+            self.tcp_link_id,
             target_pos,
             target_orn,
             restPoses=self.rest_poses,
@@ -253,7 +260,7 @@ class BaseRobotArm:
         # get joint positions using inverse kinematics
         joint_poses = self._pb.calculateInverseKinematics(
             self.embodiment_id,
-            self.TCP_link_id,
+            self.tcp_link_id,
             target_pos,
             target_orn,
             restPoses=self.rest_poses,
@@ -299,7 +306,7 @@ class BaseRobotArm:
         # used to map joing velocities to TCP velocities
         jac_t, jac_r = self._pb.calculateJacobian(
             self.embodiment_id,
-            self.TCP_link_id,
+            self.tcp_link_id,
             [0, 0, 0],
             q,
             qd,
@@ -403,58 +410,6 @@ class BaseRobotArm:
         print("tcp orn:     ", tcp_orn)
         print("tcp lin vel: ", tcp_lin_vel)
         print("tcp ang vel: ", tcp_ang_vel)
-
-    def draw_ee(self, lifetime=0.1):
-        self._pb.addUserDebugLine(
-            [0, 0, 0],
-            [0.1, 0, 0],
-            [1, 0, 0],
-            parentObjectUniqueId=self.embodiment_id,
-            parentLinkIndex=self.EE_link_id,
-            lifeTime=lifetime,
-        )
-        self._pb.addUserDebugLine(
-            [0, 0, 0],
-            [0, 0.1, 0],
-            [0, 1, 0],
-            parentObjectUniqueId=self.embodiment_id,
-            parentLinkIndex=self.EE_link_id,
-            lifeTime=lifetime,
-        )
-        self._pb.addUserDebugLine(
-            [0, 0, 0],
-            [0, 0, 0.1],
-            [0, 0, 1],
-            parentObjectUniqueId=self.embodiment_id,
-            parentLinkIndex=self.EE_link_id,
-            lifeTime=lifetime,
-        )
-
-    def draw_tcp(self, lifetime=0.1):
-        self._pb.addUserDebugLine(
-            [0, 0, 0],
-            [0.1, 0, 0],
-            [1, 0, 0],
-            parentObjectUniqueId=self.embodiment_id,
-            parentLinkIndex=self.TCP_link_id,
-            lifeTime=lifetime,
-        )
-        self._pb.addUserDebugLine(
-            [0, 0, 0],
-            [0, 0.1, 0],
-            [0, 1, 0],
-            parentObjectUniqueId=self.embodiment_id,
-            parentLinkIndex=self.TCP_link_id,
-            lifeTime=lifetime,
-        )
-        self._pb.addUserDebugLine(
-            [0, 0, 0],
-            [0, 0, 0.1],
-            [0, 0, 1],
-            parentObjectUniqueId=self.embodiment_id,
-            parentLinkIndex=self.TCP_link_id,
-            lifeTime=lifetime,
-        )
 
     def draw_workframe(self, lifetime=0.1):
         rpy = [0, 0, 0]
@@ -580,7 +535,7 @@ class BaseRobotArm:
             targ_pos, targ_orn = self.workframe_to_worldframe(pos, [0, 0, 0])
 
             joint_poses = self._pb.calculateInverseKinematics(
-                self.embodiment_id, self.TCP_link_id, targ_pos, targ_orn, maxNumIterations=5
+                self.embodiment_id, self.tcp_link_id, targ_pos, targ_orn, maxNumIterations=5
             )
             joint_poses = joint_poses[: self.num_control_dofs]
 

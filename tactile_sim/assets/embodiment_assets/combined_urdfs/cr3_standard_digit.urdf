@@ -1,0 +1,329 @@
+<?xml version="1.0" ?>
+<robot name="cr3_robot">
+	<link name="world">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<mass value="0.00000"/>
+			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
+		</inertial>
+	</link>
+	<link name="base_link">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="-0.00272 0.00000 0.02204"/>
+			<mass value="0.65300"/>
+			<inertia ixx="0.00150" ixy="0" ixz="0" iyy="0.00228" iyz="0" izz="0.00280"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/base_link.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_0_0">
+				<color rgba="1.00000 1.00000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/base_link.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link1">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="-0.00004 -0.00395 0.00364"/>
+			<mass value="1.31101"/>
+			<inertia ixx="0.00417" ixy="0" ixz="0" iyy="0.00400" iyz="0" izz="0.00282"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link1.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_1_0">
+				<color rgba="1.00000 1.00000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link1.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link2">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="-0.12924 0.00001 0.13317"/>
+			<mass value="3.40044"/>
+			<inertia ixx="0.01108" ixy="0" ixz="0" iyy="0.04822" iyz="0" izz="0.04400"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link2.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_2_0">
+				<color rgba="1.00000 1.00000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link2.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link3">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="-0.11982 0.00000 0.00999"/>
+			<mass value="2.21449"/>
+			<inertia ixx="0.00597" ixy="0" ixz="0" iyy="0.02366" iyz="0" izz="0.02138"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link3.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_3_0">
+				<color rgba="1.00000 1.00000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link3.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link4">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00345 -0.00287"/>
+			<mass value="0.84227"/>
+			<inertia ixx="0.00223" ixy="0" ixz="0" iyy="0.00124" iyz="0" izz="0.00215"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link4.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_4_0">
+				<color rgba="1.00000 1.00000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link4.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link5">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="-0.00000 -0.00333 -0.00287"/>
+			<mass value="0.84369"/>
+			<inertia ixx="0.00224" ixy="0" ixz="0" iyy="0.00125" iyz="0" izz="0.00216"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link5.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_5_0">
+				<color rgba="1.00000 1.00000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link5.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="Link6">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="-0.00000 0.00027 -0.02014"/>
+			<mass value="0.15941"/>
+			<inertia ixx="0.00015" ixy="0" ixz="0" iyy="0.00013" iyz="0" izz="0.00023"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link6.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_6_0">
+				<color rgba="1.00000 1.00000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link6.STL" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="ee_link">
+		<inertial>
+			<origin rpy="-3.14000 -0.00000 1.57000" xyz="0.00000 0.00000 0.00000"/>
+			<mass value="0.00000"/>
+			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<sphere radius="0.00100"/>
+			</geometry>
+			<material name="mat_7_0">
+				<color rgba="1.00000 1.00000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<sphere radius="0.00100"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="digit_body_link">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00443 -0.01409 0.00000"/>
+			<mass value="0.00778"/>
+			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.03500"/>
+			<geometry>
+				<mesh filename="../sensor_assets/standard_digit/body/digit_body.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_-1_0">
+				<color rgba="0.00000 0.00000 0.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.03500"/>
+			<geometry>
+				<mesh filename="../sensor_assets/standard_digit/body/digit_body.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="digit_tip_link">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="-0.00000 0.00554 -0.00576"/>
+			<mass value="0.00130"/>
+			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 -0.03500"/>
+			<geometry>
+				<mesh filename="../sensor_assets/standard_digit/tip/digit_core.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_0_0">
+				<color rgba="1.00000 1.00000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 -0.03500"/>
+			<geometry>
+				<mesh filename="../sensor_assets/standard_digit/tip/digit_skin.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="tcp_link">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 1.57000" xyz="0.00000 0.00000 0.00000"/>
+			<mass value="0.00000"/>
+			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<sphere radius="0.00100"/>
+			</geometry>
+			<material name="mat_1_0">
+				<color rgba="0.90000 0.00000 0.20000 0.50000" />
+			</material>
+		</visual>
+	</link>
+	<joint name="world_joint" type="fixed">
+		<parent link="world"/>
+		<child link="base_link"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="0.00000 -0.00000 -3.14000" xyz="0.00000 0.00000 0.00000"/>
+		<axis xyz="0.00000 0.00000 0.00000"/>
+	</joint>
+	<joint name="joint1" type="revolute">
+		<parent link="base_link"/>
+		<child link="Link1"/>
+		<limit effort="0.00000" lower="-3.14000" upper="3.14000" velocity="0.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.12830"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="joint2" type="revolute">
+		<parent link="Link1"/>
+		<child link="Link2"/>
+		<limit effort="0.00000" lower="-3.14000" upper="3.14000" velocity="0.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="0.00000 1.57080 4.71239" xyz="0.00000 0.00000 0.00000"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="joint3" type="revolute">
+		<parent link="Link2"/>
+		<child link="Link3"/>
+		<limit effort="0.00000" lower="-2.86000" upper="2.86000" velocity="0.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="0.00000 -0.00000 0.00000" xyz="-0.27400 0.00000 0.00000"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="joint4" type="revolute">
+		<parent link="Link3"/>
+		<child link="Link4"/>
+		<limit effort="0.00000" lower="-3.14000" upper="3.14000" velocity="0.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="0.00000 0.00000 -1.57080" xyz="-0.23000 0.00000 0.12830"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="joint5" type="revolute">
+		<parent link="Link4"/>
+		<child link="Link5"/>
+		<limit effort="0.00000" lower="-3.14000" upper="3.14000" velocity="0.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="1.57080 -0.00000 0.00000" xyz="0.00000 -0.11600 0.00000"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="joint6" type="revolute">
+		<parent link="Link5"/>
+		<child link="Link6"/>
+		<limit effort="0.00000" lower="-6.28000" upper="6.28000" velocity="0.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="-1.57080 0.00000 0.00000" xyz="0.00000 0.10500 0.00000"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="ee_joint" type="fixed">
+		<parent link="Link6"/>
+		<child link="ee_link"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="3.14000 -0.00000 -0.00000" xyz="0.00000 0.00000 0.00000"/>
+		<axis xyz="0.00000 0.00000 0.00000"/>
+	</joint>
+	<joint name="joint_dummy1" type="fixed">
+		<parent link="ee_link"/>
+		<child link="digit_body_link"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="-3.14159 0.00000 3.14159" xyz="0.00000 0.00000 0.00000"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="digit_tip_to_body" type="fixed">
+		<parent link="digit_body_link"/>
+		<child link="digit_tip_link"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="-3.14159 -0.00000 1.57080" xyz="-0.00152 -0.00001 -0.00415"/>
+		<axis xyz="0.00000 0.00000 0.00000"/>
+	</joint>
+	<joint name="tcp_joint" type="fixed">
+		<parent link="digit_body_link"/>
+		<child link="tcp_link"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00070 0.00000 0.04000"/>
+		<axis xyz="0.00000 0.00000 0.00000"/>
+	</joint>
+</robot>

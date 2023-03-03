@@ -45,7 +45,7 @@ def load_environment(pb):
     # set debug camera position
     cam_params = {
         'image_size': [512, 512],
-        'dist': 0.25,
+        'dist': 1.0,
         'yaw': 90.0,
         'pitch': -25.0,
         'pos': [0.6, 0.0, 0.0525],
@@ -70,8 +70,24 @@ def load_embodiment(pb):
     Create a robot arm with attached tactile sensor as our agent embodiment.
     """
 
+    robot_arm_type = "ur5"
+    # robot_arm_type = "franka_panda"
+    # robot_arm_type = "kuka_iiwa"
+    # robot_arm_type = "mg400"
+    # robot_arm_type = "cr3"
+
     # define sensor parameters
     sensor_type = "standard_tactip"
+    # sensor_type = "standard_digit"
+    # sensor_type = "standard_digitac"
+
+    # sensor_type = "mini_tactip"
+    # sensor_type = "flat_tactip"
+
+    # sensor_type = "right_angle_tactip"
+    # sensor_type = "right_angle_digit"
+    # sensor_type = "right_angle_digitac"
+
     sensor_params = {
         "type": sensor_type,
         "core": "no_core",
@@ -81,8 +97,7 @@ def load_embodiment(pb):
     }
 
     # on reset, joints are automatically set to the values defined here
-    robot_arm_type = "ur5"
-    rest_poses = rest_poses_dict[robot_arm_type][sensor_type]
+    rest_poses = rest_poses_dict[robot_arm_type]
 
     # define limits of the tool center point
     tcp_lims = np.zeros(shape=(6, 2))
@@ -100,9 +115,9 @@ def load_embodiment(pb):
         "tcp_lims": tcp_lims,
     }
 
-    workframe = [0.65, 0.0, 0.0525, -np.pi, 0.0, 0.0]
+    workframe = [0.35, 0.0, 0.1, -np.pi, 0.0, 0.0]
     show_gui = True
-    show_tactile = True
+    show_tactile = False
 
     # load the ur5 with a tactip attached
     embodiment = ArmSensorEmbodiment(
@@ -123,10 +138,14 @@ def demo_robot_control():
     load_environment(pb)
     embodiment = load_embodiment(pb)
 
+    embodiment.arm.tcp_direct_workframe_move([0.0, 0.0, 0.0], [0.0, 0.0, 0.0])
+    embodiment.blocking_move(max_steps=10000, constant_vel=0.001)
+
     while pb.isConnected():
 
-        # embodiment.arm.draw_workframe()
-        # embodiment.arm.draw_tcp()
+        embodiment.arm.draw_workframe()
+        embodiment.draw_tcp()
+        embodiment.draw_ee()
         embodiment.step_sim()
 
         time.sleep(timestep)

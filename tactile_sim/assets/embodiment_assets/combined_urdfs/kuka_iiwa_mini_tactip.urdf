@@ -1,0 +1,359 @@
+<?xml version="1.0" ?>
+<robot name="lbr_iiwa">
+	<link name="world">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<mass value="0.00000"/>
+			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
+		</inertial>
+	</link>
+	<link name="base_link">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="-0.10000 0.00000 0.07000"/>
+			<mass value="0.00000"/>
+			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_0.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_0_0">
+				<color rgba="0.20000 0.20000 0.20000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_0.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="lbr_iiwa_link_1">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 -0.03000 0.12000"/>
+			<mass value="4.00000"/>
+			<inertia ixx="0.04509" ixy="0" ixz="0" iyy="0.04124" iyz="0" izz="0.02474"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_1.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_1_0">
+				<color rgba="0.50000 0.70000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_1.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="lbr_iiwa_link_2">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00030 0.05900 0.04200"/>
+			<mass value="4.00000"/>
+			<inertia ixx="0.04343" ixy="0" ixz="0" iyy="0.02460" iyz="0" izz="0.03965"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_2.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_2_0">
+				<color rgba="0.50000 0.70000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_2.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="lbr_iiwa_link_3">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.03000 0.13000"/>
+			<mass value="3.00000"/>
+			<inertia ixx="0.03130" ixy="0" ixz="0" iyy="0.02744" iyz="0" izz="0.01394"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_3.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_3_0">
+				<color rgba="1.00000 0.42353 0.03922 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_3.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="lbr_iiwa_link_4">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.06700 0.03400"/>
+			<mass value="2.70000"/>
+			<inertia ixx="0.02302" ixy="0" ixz="0" iyy="0.01255" iyz="0" izz="0.01957"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_4.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_4_0">
+				<color rgba="0.50000 0.70000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_4.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="lbr_iiwa_link_5">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00010 0.02100 0.07600"/>
+			<mass value="1.70000"/>
+			<inertia ixx="0.01559" ixy="0" ixz="0" iyy="0.01421" iyz="0" izz="0.00710"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_5.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_5_0">
+				<color rgba="0.50000 0.70000 1.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_5.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="lbr_iiwa_link_6">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00060 0.00040"/>
+			<mass value="1.80000"/>
+			<inertia ixx="0.00761" ixy="0" ixz="0" iyy="0.00597" iyz="0" izz="0.00738"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_6.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_6_0">
+				<color rgba="1.00000 0.42353 0.03922 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_6.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="lbr_iiwa_link_7">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.02000"/>
+			<mass value="0.30000"/>
+			<inertia ixx="0.00039" ixy="0" ixz="0" iyy="0.00040" iyz="0" izz="0.00060"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_7.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_7_0">
+				<color rgba="0.20000 0.20000 0.20000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../robot_arm_assets/kuka_iiwa/meshes/link_7.stl" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="ee_link">
+		<inertial>
+			<origin rpy="-3.14000 -0.00000 1.57000" xyz="0.00000 0.00000 0.00000"/>
+			<mass value="0.00000"/>
+			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<sphere radius="0.00500"/>
+			</geometry>
+			<material name="mat_8_0">
+				<color rgba="0.90000 0.00000 0.20000 0.50000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<sphere radius="0.00100"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="tactip_body_link">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<mass value="0.25000"/>
+			<inertia ixx="0.00010" ixy="0" ixz="0" iyy="0.00010" iyz="0" izz="0.00013"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../sensor_assets/mini_tactip/body/minitip_body.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_-1_0">
+				<color rgba="0.20000 0.20000 0.20000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../sensor_assets/mini_tactip/body/minitip_body.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="tactip_tip_link">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<mass value="0.01000"/>
+			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../sensor_assets/mini_tactip/tip/skin.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+			<material name="mat_0_0">
+				<color rgba="0.00000 0.00000 0.00000 1.00000" />
+			</material>
+		</visual>
+		<collision>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<mesh filename="../sensor_assets/mini_tactip/tip/core.obj" scale="1.00000 1.00000 1.00000"/>
+			</geometry>
+		</collision>
+	</link>
+	<link name="tcp_link">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 1.57000" xyz="0.00000 0.00000 0.00000"/>
+			<mass value="0.00000"/>
+			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
+		</inertial>
+		<visual>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<geometry>
+				<sphere radius="0.00100"/>
+			</geometry>
+			<material name="mat_1_0">
+				<color rgba="0.90000 0.00000 0.20000 0.50000" />
+			</material>
+		</visual>
+	</link>
+	<joint name="world_joint" type="fixed">
+		<parent link="world"/>
+		<child link="base_link"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+		<axis xyz="0.00000 0.00000 0.00000"/>
+	</joint>
+	<joint name="lbr_iiwa_joint_1" type="revolute">
+		<parent link="base_link"/>
+		<child link="lbr_iiwa_link_1"/>
+		<limit effort="300.00000" lower="-100.00000" upper="100.00000" velocity="10.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.15750"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="lbr_iiwa_joint_2" type="revolute">
+		<parent link="lbr_iiwa_link_1"/>
+		<child link="lbr_iiwa_link_2"/>
+		<limit effort="300.00000" lower="-100.00000" upper="100.00000" velocity="10.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="1.57080 -0.00000 -3.14159" xyz="0.00000 0.00000 0.20250"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="lbr_iiwa_joint_3" type="revolute">
+		<parent link="lbr_iiwa_link_2"/>
+		<child link="lbr_iiwa_link_3"/>
+		<limit effort="300.00000" lower="-100.00000" upper="100.00000" velocity="10.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="1.57080 -0.00000 -3.14159" xyz="0.00000 0.20450 0.00000"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="lbr_iiwa_joint_4" type="revolute">
+		<parent link="lbr_iiwa_link_3"/>
+		<child link="lbr_iiwa_link_4"/>
+		<limit effort="300.00000" lower="-100.00000" upper="100.00000" velocity="10.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="1.57080 -0.00000 0.00000" xyz="0.00000 0.00000 0.21550"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="lbr_iiwa_joint_5" type="revolute">
+		<parent link="lbr_iiwa_link_4"/>
+		<child link="lbr_iiwa_link_5"/>
+		<limit effort="300.00000" lower="-100.00000" upper="100.00000" velocity="10.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="1.57080 -0.00000 3.14159" xyz="0.00000 0.18450 0.00000"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="lbr_iiwa_joint_6" type="revolute">
+		<parent link="lbr_iiwa_link_5"/>
+		<child link="lbr_iiwa_link_6"/>
+		<limit effort="300.00000" lower="-100.00000" upper="100.00000" velocity="10.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="1.57080 -0.00000 0.00000" xyz="0.00000 0.00000 0.21550"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="lbr_iiwa_joint_7" type="revolute">
+		<parent link="lbr_iiwa_link_6"/>
+		<child link="lbr_iiwa_link_7"/>
+		<limit effort="300.00000" lower="-100.00000" upper="100.00000" velocity="10.00000"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="1.57080 -0.00000 3.14159" xyz="0.00000 0.08100 0.00000"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="ee_joint" type="fixed">
+		<parent link="lbr_iiwa_link_7"/>
+		<child link="ee_link"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="3.14000 -0.00000 -0.00000" xyz="0.00000 0.00000 0.04000"/>
+		<axis xyz="0.00000 0.00000 0.00000"/>
+	</joint>
+	<joint name="joint_dummy1" type="fixed">
+		<parent link="ee_link"/>
+		<child link="tactip_body_link"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="-3.14159 0.00000 3.14159" xyz="0.00000 0.00000 0.00000"/>
+		<axis xyz="0.00000 0.00000 1.00000"/>
+	</joint>
+	<joint name="tactip_tip_to_body" type="fixed">
+		<parent link="tactip_body_link"/>
+		<child link="tactip_tip_link"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="1.57000 -0.00000 0.00000" xyz="0.00000 0.00000 0.03500"/>
+		<axis xyz="0.00000 0.00000 0.00000"/>
+	</joint>
+	<joint name="tcp_joint" type="fixed">
+		<parent link="tactip_body_link"/>
+		<child link="tcp_link"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.05500"/>
+		<axis xyz="0.00000 0.00000 0.00000"/>
+	</joint>
+</robot>
