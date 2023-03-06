@@ -2,44 +2,6 @@
 <!--FOR GRIPPER, THERE IS NO LINK INERTIA DEFINED HERE-->
 <robot name="universal_robot">
 
-  <!-- Colors -->
-  <material name="DarkGrey">
-    <color rgba="0.2 0.2 0.2 1.0"/>
-  </material>
-  <material name="Grey">
-    <color rgba="0.4 0.4 0.4 1.0"/>
-  </material>
-  <material name="Orange">
-    <color rgba="1.0 0.423529411765 0.0392156862745 1.0"/>
-  </material>
-  <material name="Blue">
-    <color rgba="0 0.1 1.0 1.0"/>
-  </material>
-  <material name="LightGrey">
-    <color rgba="0.7 0.7 0.7 1.0"/>
-  </material>
-  <material name="Red">
-    <color rgba="0.9 0 0.2 1.0"/>
-  </material>
-  <material name="TransparentRed">
-    <color rgba="0.9 0 0.2 0.5"/>
-  </material>
-  <material name="Green">
-    <color rgba="0 0.9 0.5 1.0"/>
-  </material>
-  <material name="Yellow">
-    <color rgba="0.7 0.7 0 1.0"/>
-  </material>
-  <material name="LightBlue">
-    <color rgba="0. 0.3 1.0 1.0"/>
-  </material>
-  <material name="Black">
-    <color rgba="0.05 0.05 0.05 1.0"/>
-  </material>
-  <material name="White">
-    <color rgba="1.0 1.0 1.0 1.0" />
-  </material>
-
   <!-- DigiTac -->
   <link
     name="digitac_body_link">
@@ -65,11 +27,9 @@
         <mesh
           filename="body/digitac_body.stl" />
       </geometry>
-      <material
-        name="body color">
-        <color
-          rgba="0.0 0.0 0.0 1" />
-      </material>
+      <material name="whitish">
+       <color rgba="0.8 0.8 0.8 1.0"/>
+     </material>
     </visual>
     <collision>
       <origin
@@ -106,11 +66,9 @@
         <mesh
           filename="tip/digitac_skin.stl" />
       </geometry>
-      <material
-        name="digitac_skin">
-        <color
-          rgba="1.0 1.0 1.0 1" />
-      </material>
+      <material name="black">
+         <color rgba="0.0 0.0 0.0 1.0"/>
+     </material>
     </visual>
     <collision>
       <origin
@@ -118,7 +76,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="tip/digitac_core.stl" />
+          filename="tip/digitac_skin.stl" />
       </geometry>
     </collision>
   </link>
@@ -146,7 +104,9 @@
       <geometry>
         <sphere radius="0.001"/>
       </geometry>
-       <material name="TransparentRed"/>
+      <material name="TransparentRed">
+        <color rgba="0.9 0 0.2 0.5"/>
+      </material>
     </visual>
     <inertial>
       <mass value="0.0"/>

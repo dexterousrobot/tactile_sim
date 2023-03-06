@@ -16,16 +16,16 @@
 		<visual>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/base_link.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/base_link.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_0_0">
+			<material name="mat_0">
 				<color rgba="1.00000 1.00000 1.00000 1.00000" />
 			</material>
 		</visual>
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/base_link.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/base_link.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
 		</collision>
 	</link>
@@ -38,16 +38,16 @@
 		<visual>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link1.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link1.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_1_0">
+			<material name="mat_1">
 				<color rgba="1.00000 1.00000 1.00000 1.00000" />
 			</material>
 		</visual>
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link1.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link1.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
 		</collision>
 	</link>
@@ -60,16 +60,16 @@
 		<visual>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link2.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link2.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_2_0">
+			<material name="mat_2">
 				<color rgba="1.00000 1.00000 1.00000 1.00000" />
 			</material>
 		</visual>
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link2.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link2.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
 		</collision>
 	</link>
@@ -82,16 +82,16 @@
 		<visual>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link3.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link3.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_3_0">
+			<material name="mat_3">
 				<color rgba="1.00000 1.00000 1.00000 1.00000" />
 			</material>
 		</visual>
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link3.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link3.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
 		</collision>
 	</link>
@@ -104,16 +104,16 @@
 		<visual>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link4.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link4.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_4_0">
+			<material name="mat_4">
 				<color rgba="1.00000 1.00000 1.00000 1.00000" />
 			</material>
 		</visual>
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link4.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link4.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
 		</collision>
 	</link>
@@ -126,16 +126,16 @@
 		<visual>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link5.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link5.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_5_0">
+			<material name="mat_5">
 				<color rgba="1.00000 1.00000 1.00000 1.00000" />
 			</material>
 		</visual>
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link5.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link5.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
 		</collision>
 	</link>
@@ -148,16 +148,16 @@
 		<visual>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link6.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link6.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_6_0">
+			<material name="mat_6">
 				<color rgba="1.00000 1.00000 1.00000 1.00000" />
 			</material>
 		</visual>
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/robot_arm_assets/cr3/meshes/Link6.STL" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../robot_arm_assets/cr3/meshes/Link6.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
 		</collision>
 	</link>
@@ -172,7 +172,7 @@
 			<geometry>
 				<sphere radius="0.00100"/>
 			</geometry>
-			<material name="mat_7_0">
+			<material name="mat_7">
 				<color rgba="1.00000 1.00000 1.00000 1.00000" />
 			</material>
 		</visual>
@@ -192,16 +192,16 @@
 		<visual>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/sensor_assets/flat_tactip/../standard_tactip/body/tactip_body.obj" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../sensor_assets/flat_tactip/../standard_tactip/body/tactip_body.obj" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_-1_0">
+			<material name="mat_8">
 				<color rgba="0.80000 0.80000 0.80000 1.00000" />
 			</material>
 		</visual>
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/sensor_assets/flat_tactip/../standard_tactip/body/tactip_body.obj" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../sensor_assets/flat_tactip/../standard_tactip/body/tactip_body.obj" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
 		</collision>
 	</link>
@@ -214,16 +214,16 @@
 		<visual>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/sensor_assets/flat_tactip/tip/skin.obj" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../sensor_assets/flat_tactip/tip/skin.obj" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_0_0">
+			<material name="mat_9">
 				<color rgba="0.00000 0.00000 0.00000 1.00000" />
 			</material>
 		</visual>
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="/data_drive/alexc/DexterousRobotics/tactile_sim/tactile_sim/assets/sensor_assets/flat_tactip/tip/skin.obj" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../sensor_assets/flat_tactip/tip/skin.obj" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
 		</collision>
 	</link>
@@ -238,7 +238,7 @@
 			<geometry>
 				<sphere radius="0.00100"/>
 			</geometry>
-			<material name="mat_1_0">
+			<material name="mat_10">
 				<color rgba="0.90000 0.00000 0.20000 0.50000" />
 			</material>
 		</visual>

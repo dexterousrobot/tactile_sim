@@ -518,36 +518,3 @@ class BaseRobotArm:
                 np.isclose(init_ang_vel, world_ang_vel).all(),
             )
         )
-
-    def move_in_circle(self):
-
-        for i in range(360 * 5):
-            t = i * np.pi / 180
-
-            rad = 0.15
-            pos = [
-                self.TCP_pos[0] + rad * math.cos(t),
-                self.TCP_pos[1] + rad * math.sin(t),
-                self.TCP_pos[2],
-            ]
-
-            # convert to world coords for IK
-            targ_pos, targ_orn = self.workframe_to_worldframe(pos, [0, 0, 0])
-
-            joint_poses = self._pb.calculateInverseKinematics(
-                self.embodiment_id, self.tcp_link_id, targ_pos, targ_orn, maxNumIterations=5
-            )
-            joint_poses = joint_poses[: self.num_control_dofs]
-
-            self._pb.setJointMotorControlArray(
-                self.embodiment_id,
-                self.control_joint_ids,
-                self._pb.POSITION_CONTROL,
-                targetPositions=joint_poses,
-                targetVelocities=[0] * self.num_control_dofs,
-                positionGains=[self.pos_gain] * self.num_control_dofs,
-                velocityGains=[self.vel_gain] * self.num_control_dofs,
-                forces=[self.max_force] * self.num_control_dofs,
-            )
-            self._pb.stepSimulation()
-            time.sleep(1.0 / 240)

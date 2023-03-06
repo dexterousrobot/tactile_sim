@@ -41,6 +41,7 @@ class ArmSensorEmbodiment:
             pb,
             embodiment_id=self.embodiment_id,
             link_name_to_index=self.link_name_to_index,
+            joint_name_to_index=self.joint_name_to_index,
             image_size=sensor_params["image_size"],
             turn_off_border=sensor_params["turn_off_border"],
             sensor_type=sensor_params["type"],
@@ -140,13 +141,10 @@ class ArmSensorEmbodiment:
 
         if control_mode == "TCP_position_control":
             self.arm.tcp_position_control(motor_commands)
-
         elif control_mode == "TCP_velocity_control":
             self.arm.tcp_velocity_control(motor_commands)
-
         elif control_mode == "joint_velocity_control":
             self.arm.joint_velocity_control(motor_commands)
-
         else:
             sys.exit("Incorrect control mode specified: {}".format(control_mode))
 

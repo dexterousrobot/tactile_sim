@@ -1,10 +1,6 @@
 <?xml version="1.0" ?>
 <robot name="standard_tactip.urdf">
 
-    <material name="TransparentRed">
-      <color rgba="0.9 0 0.2 0.5"/>
-    </material>
-
     <link name="tactip_body_link">
       <inertial>
         <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -14,7 +10,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-                  <mesh filename="body/tactip_body.obj" scale="1.0 1.0 1.0"/>
+        <mesh filename="body/tactip_body.obj" scale="1.0 1.0 1.0"/>
         </geometry>
          <material name="whitish">
           <color rgba="0.8 0.8 0.8 1.0"/>
@@ -23,7 +19,7 @@
       <collision>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <geometry>
-                  <mesh filename="body/tactip_body.obj" scale="1.0 1.0 1.0"/>
+        <mesh filename="body/tactip_body.obj" scale="1.0 1.0 1.0"/>
         </geometry>
       </collision>
     </link>
@@ -70,7 +66,9 @@
         <geometry>
           <sphere radius="0.001"/>
         </geometry>
-         <material name="TransparentRed"/>
+        <material name="TransparentRed">
+          <color rgba="0.9 0 0.2 0.5"/>
+        </material>
       </visual>
       <inertial>
         <mass value="0.0"/>

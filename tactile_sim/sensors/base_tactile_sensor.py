@@ -1,22 +1,9 @@
 import os
+import sys
 import numpy as np
 import cv2
 
 from tactile_sim.assets import add_assets_path
-
-
-SENSOR_TYPES = [
-    'standard_tactip',
-    'standard_digit',
-    'standard_digitac',
-    'flat_tactip',
-    'mini_tactip',
-    'right_angle_tactip',
-    'right_angle_digit',
-    'right_angle_digitac',
-    'right_angle_flat_tactip',
-    'right_angle_mini_tactip',
-]
 
 
 class TactileSensor:
@@ -25,6 +12,7 @@ class TactileSensor:
         pb,
         embodiment_id,
         link_name_to_index,
+        joint_name_to_index,
         image_size=[128, 128],
         turn_off_border=False,
         sensor_type="standard",
@@ -33,7 +21,6 @@ class TactileSensor:
         show_tactile=True,
         sensor_num=int(0),
     ):
-
         self._pb = pb
         self.embodiment_id = embodiment_id
         self.show_tactile = show_tactile
@@ -44,6 +31,8 @@ class TactileSensor:
         self.image_size = image_size
         self.turn_off_border = turn_off_border
         self.sensor_num = sensor_num
+        self.link_name_to_index = link_name_to_index
+        self.joint_name_to_index = joint_name_to_index
 
         # get relevent link ids for turning off collisions, connecting camera, etc
         self.tactile_link_ids = {}
@@ -52,9 +41,14 @@ class TactileSensor:
         if self.sensor_family + "_adapter_link" in link_name_to_index.keys():
             self.tactile_link_ids['adapter'] = link_name_to_index["tactip_adapter_link"]
 
-        self.load_reference_images()
+        # get the link and tcp IDs
+        self.ee_link_id = self.link_name_to_index["ee_link"]
+        self.tcp_link_id = self.link_name_to_index["tcp_link"]
+
         self.setup_camera_info()
+        self.load_reference_images()
         # self.save_reference_images()
+        self.update_cam_frame()
         self.connect()
         self.turn_off_collisions()
 
@@ -131,6 +125,15 @@ class TactileSensor:
         nodef_dep_savefile = os.path.join(saved_file_dir, "nodef_dep.npy")
         border_mask_savefile = os.path.join(saved_file_dir, "border_mask.npy")
 
+        # plt the reference images for checking
+        # import matplotlib.pyplot as plt
+        # fig, axs = plt.subplots(1, 3)
+        # axs[0].imshow(no_deformation_gray, cmap='gray')
+        # axs[1].imshow(no_deformation_dep, cmap='gray')
+        # axs[2].imshow(border_mask, cmap='gray')
+        # plt.show(block=True)
+        # exit()
+
         # save border images from simulation
         np.save(nodef_gray_savefile, no_deformation_gray)
         np.save(nodef_dep_savefile, no_deformation_dep)
@@ -142,21 +145,61 @@ class TactileSensor:
         """
         Set parameters that define images from internal camera.
         """
-        if self.sensor_type in ["standard_tactip", "right_angle_tactip", "flat_tactip", "right_angle_flat_tactip"]:
+        # set camera position relative to the sensor body
+        if self.sensor_type == 'standard_tactip':
+            self.rel_cam_pos = (0.0, 0.0, 0.03)
+            self.rel_cam_rpy = (0, -np.pi / 2, np.pi)
             self.focal_dist = 0.065
             self.fov = 60
 
-        elif self.sensor_type in ["mini_tactip", "right_angle_mini_tactip"]:
+        elif self.sensor_type == 'standard_digit':
+            self.rel_cam_pos = (-0.00095, 0.0139, 0.015)
+            self.rel_cam_rpy = (np.pi, -np.pi/2, -np.pi)
+            self.focal_dist = 0.0015
+            self.fov = 75
+
+        elif self.sensor_type == 'standard_digitac':
+            self.rel_cam_pos = (-0.00095, 0.0139, 0.015)
+            self.rel_cam_rpy = (np.pi, -np.pi/2, -np.pi)
+            self.focal_dist = 0.0015
+            self.fov = 65
+
+        elif self.sensor_type == 'mini_tactip':
+            self.rel_cam_pos = (0.0, 0.0, 0.0)
+            self.rel_cam_rpy = (0, -np.pi / 2, np.pi)
+            self.focal_dist = 0.035
+            self.fov = 55
+
+        elif self.sensor_type == 'flat_tactip':
+            self.rel_cam_pos = (0, 0, 0.03)
+            self.rel_cam_rpy = (0, -np.pi / 2, np.pi)
             self.focal_dist = 0.065
             self.fov = 60
 
-        elif self.sensor_type in ["standard_digit", "right_angle_digit", "forward_digit"]:
-            self.focal_dist = 0.0015
-            self.fov = 40
-        elif self.sensor_type in ['standard_digitac', 'right_angle_digitac', 'forward_digitac']:
-            self.focal_dist = 0.0015
-            self.fov = 40
+        elif self.sensor_type == 'right_angle_tactip':
+            self.rel_cam_pos = (0, 0, 0.03)
+            self.rel_cam_rpy = (0, -np.pi / 2, np.pi)
+            self.focal_dist = 0.065
+            self.fov = 60
 
+        elif self.sensor_type == 'right_angle_digit':
+            self.rel_cam_pos = (-0.00095, .0139, 0.0)
+            self.rel_cam_rpy = (np.pi, -np.pi/2, -np.pi)
+            self.focal_dist = 0.0015
+            self.fov = 75
+
+        elif self.sensor_type == 'right_angle_digitac':
+            self.rel_cam_pos = (-0.00095, .0139, 0.0)
+            self.rel_cam_rpy = (np.pi, -np.pi/2, -np.pi)
+            self.focal_dist = 0.0015
+            self.fov = 65
+        else:
+            sys.exit("Incorrect sensor_type specified: {}".format(self.sensor_type))
+
+        # convert quaternion
+        self.rel_cam_orn = self._pb.getQuaternionFromEuler(self.rel_cam_rpy)
+
+        # compute parameters for generating images
         self.pixel_width, self.pixel_height = self.image_size[0], self.image_size[1]
         self.aspect, self.nearplane, self.farplane = 1.0, 0.01, 1.0
         self.focal_length = 1.0 / (2 * np.tan((self.fov * (np.pi / 180)) / 2))  # not used but useful to know
@@ -167,39 +210,12 @@ class TactileSensor:
         # get the pose of the sensor body (where camera sits)
         sensor_body_pos, sensor_body_orn, _, _, _, _ = self._pb.getLinkState(
             self.embodiment_id, self.tactile_link_ids["body"], computeForwardKinematics=True
+            # self.embodiment_id, self.tcp_link_id, computeForwardKinematics=True
         )
 
-        # set camera position relative to the sensor body
-        if self.sensor_family == 'tactip':
-            if self.sensor_type in ["standard", "mini_standard", "flat"]:
-                cam_pos = (0, 0, 0.03)
-                cam_rpy = (0, -np.pi / 2, np.pi)
-            elif self.sensor_type in ["right_angle", "forward"]:
-                cam_pos = (0, 0, 0.03)
-                cam_rpy = (0, -np.pi / 2, 140 * np.pi / 180)
-            elif self.sensor_type in ["mini_right_angle"]:
-                cam_pos = (0, 0, 0.001)
-                cam_rpy = (0, -np.pi / 2, 140 * np.pi / 180)
-
-        elif self.sensor_family == 'digit':
-            if self.sensor_type in ["standard"]:
-                cam_pos = (-0.00095, .0139, 0.020)
-                cam_rpy = (np.pi, -np.pi/2, np.pi/2)
-            elif self.sensor_type in ["right_angle", "forward"]:
-                cam_pos = (-0.00095, .0139, 0.005)
-                cam_rpy = (np.pi, -np.pi/2, np.pi/2)
-        elif self.sensor_family == 'digitac':
-            if self.sensor_type in ["standard"]:
-                cam_pos = (-0.00095, .0139, 0.020)
-                cam_rpy = (np.pi, -np.pi/2, np.pi/2)
-            elif self.sensor_type in ["right_angle", "forward"]:
-                cam_pos = (-0.00095, .0139, 0.005)
-                cam_rpy = (np.pi, -np.pi/2, np.pi/2)
-
-        cam_orn = self._pb.getQuaternionFromEuler(cam_rpy)
-
         # get the camera frame relative to world frame
-        self.camframe_pos, self.camframe_orn = self._pb.multiplyTransforms(sensor_body_pos, sensor_body_orn, cam_pos, cam_orn)
+        self.camframe_pos, self.camframe_orn = self._pb.multiplyTransforms(
+            sensor_body_pos, sensor_body_orn, self.rel_cam_pos, self.rel_cam_orn)
 
     def camframe_to_worldframe(self, pos, rpy):
         """
@@ -242,12 +258,6 @@ class TactileSensor:
             cam_target_pos,
             up_vector,
         )
-
-        # draw a line at these points for debugging
-        # extended_cam_pos = self.camframe_pos + np.array(foward_vector)
-        # extended_up_pos  = self.camframe_pos + np.array(up_vector)
-        # self._pb.addUserDebugLine(self.camframe_pos, extended_cam_pos, [0, 1, 1], parentObjectUniqueId=-1, parentLinkIndex=-1, lifeTime=0.1)
-        # self._pb.addUserDebugLine(self.camframe_pos, extended_up_pos, [1, 0, 1], parentObjectUniqueId=-1, parentLinkIndex=-1, lifeTime=0.1)
 
         # projective texture runs faster but gives odd visuals
         flags = self._pb.ER_SEGMENTATION_MASK_OBJECT_AND_LINKINDEX
@@ -364,35 +374,35 @@ class TactileSensor:
     def get_observation(self):
         return self.process()
 
-    def draw_camera_frame(self):
+    def draw_camera_frame(self, lifetime=0.1):
         rpy = [0, 0, 0]
         self._pb.addUserDebugLine(
             self.camframe_pos,
             self.camframe_to_worldframe([0.1, 0, 0], rpy)[0],
             [1, 0, 0],
-            lifeTime=0.1,
+            lifeTime=lifetime,
         )
         self._pb.addUserDebugLine(
             self.camframe_pos,
             self.camframe_to_worldframe([0, 0.1, 0], rpy)[0],
             [0, 1, 0],
-            lifeTime=0.1,
+            lifeTime=lifetime,
         )
         self._pb.addUserDebugLine(
             self.camframe_pos,
             self.camframe_to_worldframe([0, 0, 0.1], rpy)[0],
             [0, 0, 1],
-            lifeTime=0.1,
+            lifeTime=lifetime,
         )
 
-    def draw_sensor_frame(self):
+    def draw_sensor_frame(self, lifetime=0.1):
         self._pb.addUserDebugLine(
             [0, 0, 0],
             [0.1, 0, 0],
             [1, 0, 0],
             parentObjectUniqueId=self.embodiment_id,
             parentLinkIndex=self.tactile_link_ids["body"],
-            lifeTime=0.1,
+            lifeTime=lifetime,
         )
         self._pb.addUserDebugLine(
             [0, 0, 0],
@@ -400,7 +410,7 @@ class TactileSensor:
             [0, 1, 0],
             parentObjectUniqueId=self.embodiment_id,
             parentLinkIndex=self.tactile_link_ids["body"],
-            lifeTime=0.1,
+            lifeTime=lifetime,
         )
         self._pb.addUserDebugLine(
             [0, 0, 0],
@@ -408,5 +418,5 @@ class TactileSensor:
             [0, 0, 1],
             parentObjectUniqueId=self.embodiment_id,
             parentLinkIndex=self.tactile_link_ids["body"],
-            lifeTime=0.1,
+            lifeTime=lifetime,
         )

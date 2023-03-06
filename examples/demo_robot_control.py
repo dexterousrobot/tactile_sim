@@ -1,5 +1,6 @@
 import time
 import numpy as np
+import math
 import pybullet as p
 import pybullet_utils.bullet_client as bc
 
@@ -54,10 +55,10 @@ def load_environment(pb):
         'far_val': 100.0
     }
 
-    p.configureDebugVisualizer(p.COV_ENABLE_RGB_BUFFER_PREVIEW, 0)
-    p.configureDebugVisualizer(p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, 0)
-    p.configureDebugVisualizer(p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, 0)
-    p.resetDebugVisualizerCamera(
+    pb.configureDebugVisualizer(p.COV_ENABLE_RGB_BUFFER_PREVIEW, 0)
+    pb.configureDebugVisualizer(p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, 0)
+    pb.configureDebugVisualizer(p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, 0)
+    pb.resetDebugVisualizerCamera(
         cam_params['dist'],
         cam_params['yaw'],
         cam_params['pitch'],
@@ -70,20 +71,18 @@ def load_embodiment(pb):
     Create a robot arm with attached tactile sensor as our agent embodiment.
     """
 
-    robot_arm_type = "ur5"
+    # robot_arm_type = "ur5"
     # robot_arm_type = "franka_panda"
     # robot_arm_type = "kuka_iiwa"
+    robot_arm_type = "cr3"
     # robot_arm_type = "mg400"
-    # robot_arm_type = "cr3"
 
     # define sensor parameters
     sensor_type = "standard_tactip"
     # sensor_type = "standard_digit"
     # sensor_type = "standard_digitac"
-
     # sensor_type = "mini_tactip"
     # sensor_type = "flat_tactip"
-
     # sensor_type = "right_angle_tactip"
     # sensor_type = "right_angle_digit"
     # sensor_type = "right_angle_digitac"
@@ -117,7 +116,7 @@ def load_embodiment(pb):
 
     workframe = [0.35, 0.0, 0.1, -np.pi, 0.0, 0.0]
     show_gui = True
-    show_tactile = False
+    show_tactile = True
 
     # load the ur5 with a tactip attached
     embodiment = ArmSensorEmbodiment(
@@ -132,22 +131,70 @@ def load_embodiment(pb):
     return embodiment
 
 
+def add_user_control(pb):
+    # create controllable parameters on GUI
+    action_ids = []
+    min_action, max_action = -0.25, 0.25
+
+    action_ids.append(
+        pb.addUserDebugParameter("dx", min_action, max_action, 0)
+    )
+    action_ids.append(
+        pb.addUserDebugParameter("dy", min_action, max_action, 0)
+    )
+    action_ids.append(
+        pb.addUserDebugParameter("dz", min_action, max_action, 0)
+    )
+    action_ids.append(
+        pb.addUserDebugParameter("dRX", min_action, max_action, 0)
+    )
+    action_ids.append(
+        pb.addUserDebugParameter("dRY", min_action, max_action, 0)
+    )
+    action_ids.append(
+        pb.addUserDebugParameter("dRZ", min_action, max_action, 0)
+    )
+    return action_ids
+
+
 def demo_robot_control():
     timestep = 1/240.0
     pb = setup_pybullet(timestep)
     load_environment(pb)
     embodiment = load_embodiment(pb)
 
+    action_ids = add_user_control(pb)
+
+    # move to workframe
     embodiment.arm.tcp_direct_workframe_move([0.0, 0.0, 0.0], [0.0, 0.0, 0.0])
     embodiment.blocking_move(max_steps=10000, constant_vel=0.001)
 
     while pb.isConnected():
 
-        embodiment.arm.draw_workframe()
-        embodiment.draw_tcp()
-        embodiment.draw_ee()
-        embodiment.step_sim()
+        # get an action from gui interface
+        a = []
+        for action_id in action_ids:
+            a.append(pb.readUserDebugParameter(action_id))
 
+        # apply the actions
+        embodiment.apply_action(a)
+
+        # embodiment.draw_ee()
+        # embodiment.draw_tcp()
+        # embodiment.arm.draw_workframe()
+        # embodiment.arm.print_joint_pos_vel()
+        # embodiment.sensor.draw_sensor_frame()
+        # embodiment.sensor.draw_camera_frame()
+
+        embodiment.get_tactile_observation()
+
+        #  print joint states
+        # joint_ids = list(range(embodiment.num_joints))
+        # joint_states = pb.getJointStates(embodiment.embodiment_id, joint_ids)
+        # cur_joint_pos = [joint_states[i][0] for i in joint_ids]
+        # print(cur_joint_pos)
+
+        embodiment.step_sim()
         time.sleep(timestep)
 
         q_key = ord("q")

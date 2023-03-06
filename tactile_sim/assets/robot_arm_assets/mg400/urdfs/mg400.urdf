@@ -44,6 +44,13 @@
     <color rgba="1.0 1.0 1.0 1.0" />
   </material>
 
+  <!-- connect arm to world -->
+    <link name="world"/>
+    <joint name="world_joint" type="fixed">
+      <parent link="world"/>
+      <child link="base_link"/>
+      <origin rpy="0.0 0.0 -3.14" xyz="0.0 0.0 0.0"/>
+    </joint>
 
     <link name="base_link">
         <inertial>

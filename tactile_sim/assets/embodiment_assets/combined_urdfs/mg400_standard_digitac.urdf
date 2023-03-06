@@ -1,5 +1,12 @@
 <?xml version="1.0" ?>
 <robot name="mg400">
+	<link name="world">
+		<inertial>
+			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<mass value="0.00000"/>
+			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
+		</inertial>
+	</link>
 	<link name="base_link">
 		<inertial>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00060 -0.00000 0.05609"/>
@@ -11,7 +18,7 @@
 			<geometry>
 				<mesh filename="../robot_arm_assets/mg400/meshes/base_link.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_-1_0">
+			<material name="mat_0">
 				<color rgba="0.90000 0.90000 0.90000 1.00000" />
 			</material>
 		</visual>
@@ -33,7 +40,7 @@
 			<geometry>
 				<mesh filename="../robot_arm_assets/mg400/meshes/link1.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_0_0">
+			<material name="mat_1">
 				<color rgba="0.30000 0.30000 0.30000 1.00000" />
 			</material>
 		</visual>
@@ -55,7 +62,7 @@
 			<geometry>
 				<mesh filename="../robot_arm_assets/mg400/meshes/link2_1.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_1_0">
+			<material name="mat_2">
 				<color rgba="0.30000 0.30000 0.30000 1.00000" />
 			</material>
 		</visual>
@@ -77,7 +84,7 @@
 			<geometry>
 				<mesh filename="../robot_arm_assets/mg400/meshes/link3_1.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_2_0">
+			<material name="mat_3">
 				<color rgba="0.30000 0.30000 0.30000 1.00000" />
 			</material>
 		</visual>
@@ -99,7 +106,7 @@
 			<geometry>
 				<mesh filename="../robot_arm_assets/mg400/meshes/link4_1.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_3_0">
+			<material name="mat_4">
 				<color rgba="0.90000 0.90000 0.90000 1.00000" />
 			</material>
 		</visual>
@@ -121,7 +128,7 @@
 			<geometry>
 				<mesh filename="../robot_arm_assets/mg400/meshes/link5.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_4_0">
+			<material name="mat_5">
 				<color rgba="0.90000 0.90000 0.90000 1.00000" />
 			</material>
 		</visual>
@@ -143,7 +150,7 @@
 			<geometry>
 				<sphere radius="0.00500"/>
 			</geometry>
-			<material name="mat_5_0">
+			<material name="mat_6">
 				<color rgba="0.90000 0.00000 0.20000 1.00000" />
 			</material>
 		</visual>
@@ -165,7 +172,7 @@
 			<geometry>
 				<mesh filename="../robot_arm_assets/mg400/meshes/link2_2.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_6_0">
+			<material name="mat_7">
 				<color rgba="0.90000 0.90000 0.90000 1.00000" />
 			</material>
 		</visual>
@@ -187,7 +194,7 @@
 			<geometry>
 				<mesh filename="../robot_arm_assets/mg400/meshes/link3_2.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_7_0">
+			<material name="mat_8">
 				<color rgba="0.30000 0.30000 0.30000 1.00000" />
 			</material>
 		</visual>
@@ -209,7 +216,7 @@
 			<geometry>
 				<mesh filename="../robot_arm_assets/mg400/meshes/link4_2.STL" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_8_0">
+			<material name="mat_9">
 				<color rgba="0.90000 0.90000 0.90000 1.00000" />
 			</material>
 		</visual>
@@ -231,8 +238,8 @@
 			<geometry>
 				<mesh filename="../sensor_assets/standard_digitac/body/digitac_body.stl" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_-1_0">
-				<color rgba="0.00000 0.00000 0.00000 1.00000" />
+			<material name="mat_10">
+				<color rgba="0.80000 0.80000 0.80000 1.00000" />
 			</material>
 		</visual>
 		<collision>
@@ -253,14 +260,14 @@
 			<geometry>
 				<mesh filename="../sensor_assets/standard_digitac/tip/digitac_skin.stl" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
-			<material name="mat_0_0">
-				<color rgba="1.00000 1.00000 1.00000 1.00000" />
+			<material name="mat_11">
+				<color rgba="0.00000 0.00000 0.00000 1.00000" />
 			</material>
 		</visual>
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 -0.03500"/>
 			<geometry>
-				<mesh filename="../sensor_assets/standard_digitac/tip/digitac_core.stl" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../sensor_assets/standard_digitac/tip/digitac_skin.stl" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
 		</collision>
 	</link>
@@ -275,11 +282,18 @@
 			<geometry>
 				<sphere radius="0.00100"/>
 			</geometry>
-			<material name="mat_1_0">
+			<material name="mat_12">
 				<color rgba="0.90000 0.00000 0.20000 0.50000" />
 			</material>
 		</visual>
 	</link>
+	<joint name="world_joint" type="fixed">
+		<parent link="world"/>
+		<child link="base_link"/>
+		<dynamics damping="1.0" friction="0.0001"/>
+		<origin rpy="0.00000 -0.00000 -3.14000" xyz="0.00000 0.00000 0.00000"/>
+		<axis xyz="0.00000 0.00000 0.00000"/>
+	</joint>
 	<joint name="j1" type="revolute">
 		<parent link="base_link"/>
 		<child link="link1"/>
