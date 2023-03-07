@@ -1,21 +1,27 @@
+import sys
 import numpy as np
-import math
-import time
 
 
 class BaseRobotArm:
-    def __init__(self, pb, embodiment_id, workframe, link_name_to_index, joint_name_to_index, rest_poses, tcp_lims):
+    def __init__(
+        self,
+        pb,
+        embodiment_id,
+        workframe,
+        tcp_link_id,
+        link_name_to_index,
+        joint_name_to_index,
+        rest_poses,
+        tcp_lims
+    ):
 
         self._pb = pb
         self.rest_poses = rest_poses  # default joint pose for ur5
         self.embodiment_id = embodiment_id
         self.num_joints = self._pb.getNumJoints(embodiment_id)
+        self.tcp_link_id = tcp_link_id
         self.link_name_to_index = link_name_to_index
         self.joint_name_to_index = joint_name_to_index
-
-        # get the link and tcp IDs
-        self.ee_link_id = self.link_name_to_index["ee_link"]
-        self.tcp_link_id = self.link_name_to_index["tcp_link"]
 
         # set up the work frame
         self.set_workframe(workframe)
@@ -285,14 +291,14 @@ class BaseRobotArm:
         self.target_orn_worldframe = target_orn
         self.target_joints = joint_poses
 
-    def tcp_velocity_control(self, desired_vels):
+    def tcp_velocity_control(self, desired_tcp_vels):
         """
         Actions specifiy desired velocities in the workframe.
         TCP limits are imposed.
         """
         # check that this won't push the TCP out of limits
         # zero any velocities that will
-        capped_desired_vels = self.check_TCP_vel_lims(np.array(desired_vels))
+        capped_desired_vels = self.check_TCP_vel_lims(np.array(desired_tcp_vels))
 
         # convert desired vels from workframe to worldframe
         capped_desired_vels[:3], capped_desired_vels[3:] = self.workvel_to_worldvel(
@@ -352,6 +358,120 @@ class BaseRobotArm:
             velocityGains=[self.vel_gain] * self.num_control_dofs,
             forces=[self.max_force] * self.num_control_dofs,
         )
+
+    def step_sim(self):
+        """
+        Take a step of the simulation whilst applying neccessary forces
+        """
+
+        # compensate for the effect of gravity
+        self.apply_gravity_compensation()
+
+        # step the simulation
+        self._pb.stepSimulation()
+
+    def apply_action(
+        self,
+        motor_commands,
+        control_mode="TCP_velocity_control",
+        velocity_action_repeat=1,
+        max_steps=100,
+    ):
+
+        if control_mode == "TCP_position_control":
+            self.tcp_position_control(motor_commands)
+        elif control_mode == "TCP_velocity_control":
+            self.tcp_velocity_control(motor_commands)
+        elif control_mode == "joint_velocity_control":
+            self.joint_velocity_control(motor_commands)
+        else:
+            sys.exit("Incorrect control mode specified: {}".format(control_mode))
+
+        if control_mode == "TCP_position_control":
+            # repeatedly step the sim until a target pose is met or max iters
+            self.blocking_move(max_steps=max_steps, constant_vel=None)
+
+        elif control_mode in ["TCP_velocity_control", "joint_velocity_control"]:
+            # apply the action for n steps to match control rate
+            for i in range(velocity_action_repeat):
+                self.step_sim()
+        else:
+            # just do one step of the sime
+            self.step_sim()
+
+    def blocking_move(
+        self,
+        max_steps=1000,
+        constant_vel=None,
+        pos_tol=2e-4,
+        orn_tol=1e-3,
+        jvel_tol=0.1,
+    ):
+        """
+        step the simulation until a target position has been reached or the max
+        number of steps has been reached
+        """
+        # get target position
+        targ_pos = self.target_pos_worldframe
+        targ_orn = self.target_orn_worldframe
+        targ_j_pos = self.target_joints
+
+        pos_error = 0.0
+        orn_error = 0.0
+        for i in range(max_steps):
+
+            # get the current position and veloicities (worldframe)
+            (
+                cur_TCP_pos,
+                cur_TCP_rpy,
+                cur_TCP_orn,
+                _,
+                _,
+            ) = self.get_current_TCP_pos_vel_worldframe()
+
+            # get the current joint positions and velocities
+            cur_j_pos, cur_j_vel = self.get_current_joint_pos_vel()
+
+            # Move with constant velocity (from google-ravens)
+            # break large position move to series of small position moves.
+            if constant_vel is not None:
+                diff_j = np.array(targ_j_pos) - np.array(cur_j_pos)
+                norm = np.linalg.norm(diff_j)
+                v = diff_j / norm if norm > 0 else np.zeros_like(cur_j_pos)
+                step_j = cur_j_pos + v * constant_vel
+
+                # reduce vel if joints are close enough,
+                # this helps to acheive final pose
+                if all(np.abs(diff_j) < constant_vel):
+                    constant_vel /= 2
+
+                # set joint control
+                self._pb.setJointMotorControlArray(
+                    self.embodiment_id,
+                    self.control_joint_ids,
+                    self._pb.POSITION_CONTROL,
+                    targetPositions=step_j,
+                    targetVelocities=[0.0] * self.num_control_dofs,
+                    positionGains=[self.pos_gain] * self.num_control_dofs,
+                    velocityGains=[self.vel_gain] * self.num_control_dofs
+                )
+
+            # step the simulation
+            self.step_sim()
+
+            # calc totoal velocity
+            total_j_vel = np.sum(np.abs(cur_j_vel))
+
+            # calculate the difference between target and actual pose
+            pos_error = np.sum(np.abs(targ_pos - cur_TCP_pos))
+            orn_error = np.arccos(
+                np.clip((2 * (np.inner(targ_orn, cur_TCP_orn) ** 2)) - 1, -1, 1)
+            )
+
+            # break if the pose error is small enough
+            # and the velocity is low enough
+            if (pos_error < pos_tol) and (orn_error < orn_tol) and (total_j_vel < jvel_tol):
+                break
 
     def check_TCP_pos_lims(self, pos, rpy):
         """

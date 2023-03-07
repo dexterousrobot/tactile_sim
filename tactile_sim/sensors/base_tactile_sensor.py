@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 
 from tactile_sim.assets import add_assets_path
+from tactile_sim.utils.pybullet_draw_utils import draw_link_frame
 
 
 class TactileSensor:
@@ -11,6 +12,7 @@ class TactileSensor:
         self,
         pb,
         embodiment_id,
+        tcp_link_id,
         link_name_to_index,
         joint_name_to_index,
         image_size=[128, 128],
@@ -31,6 +33,7 @@ class TactileSensor:
         self.image_size = image_size
         self.turn_off_border = turn_off_border
         self.sensor_num = sensor_num
+        self.tcp_link_id = tcp_link_id
         self.link_name_to_index = link_name_to_index
         self.joint_name_to_index = joint_name_to_index
 
@@ -40,10 +43,6 @@ class TactileSensor:
         self.tactile_link_ids['tip'] = link_name_to_index[self.sensor_family + "_tip_link"]
         if self.sensor_family + "_adapter_link" in link_name_to_index.keys():
             self.tactile_link_ids['adapter'] = link_name_to_index["tactip_adapter_link"]
-
-        # get the link and tcp IDs
-        self.ee_link_id = self.link_name_to_index["ee_link"]
-        self.tcp_link_id = self.link_name_to_index["tcp_link"]
 
         self.setup_camera_info()
         self.load_reference_images()
@@ -362,7 +361,7 @@ class TactileSensor:
         Also plot if enabled.
         """
         img = self.sensor_camera()
-        # plot rendered image
+        # display rendered image
         if not self._render_closed:
             cv2.imshow("tactile_window_{}".format(self.sensor_num), img)
             if cv2.waitKey(1) & 0xFF == 27:
@@ -376,6 +375,7 @@ class TactileSensor:
 
     def draw_camera_frame(self, lifetime=0.1):
         rpy = [0, 0, 0]
+
         self._pb.addUserDebugLine(
             self.camframe_pos,
             self.camframe_to_worldframe([0.1, 0, 0], rpy)[0],
@@ -396,27 +396,4 @@ class TactileSensor:
         )
 
     def draw_sensor_frame(self, lifetime=0.1):
-        self._pb.addUserDebugLine(
-            [0, 0, 0],
-            [0.1, 0, 0],
-            [1, 0, 0],
-            parentObjectUniqueId=self.embodiment_id,
-            parentLinkIndex=self.tactile_link_ids["body"],
-            lifeTime=lifetime,
-        )
-        self._pb.addUserDebugLine(
-            [0, 0, 0],
-            [0, 0.1, 0],
-            [0, 1, 0],
-            parentObjectUniqueId=self.embodiment_id,
-            parentLinkIndex=self.tactile_link_ids["body"],
-            lifeTime=lifetime,
-        )
-        self._pb.addUserDebugLine(
-            [0, 0, 0],
-            [0, 0, 0.1],
-            [0, 0, 1],
-            parentObjectUniqueId=self.embodiment_id,
-            parentLinkIndex=self.tactile_link_ids["body"],
-            lifeTime=lifetime,
-        )
+        draw_link_frame(self.embodiment_id, self.tactile_link_ids["body"], lifetime=lifetime)
