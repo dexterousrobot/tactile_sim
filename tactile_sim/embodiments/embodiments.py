@@ -1,11 +1,10 @@
 import os
-import sys
 import numpy as np
 
 from tactile_sim.assets import add_assets_path
 from tactile_sim.robots.arms import arm_mapping
-from tactile_sim.sensors.base_tactile_sensor import TactileSensor
-from tactile_sim.sensors.base_vision_sensor import VisionSensor
+from tactile_sim.sensors.tactile_sensor import TactileSensor
+from tactile_sim.sensors.vision_sensor import VisionSensor
 from tactile_sim.utils.pybullet_draw_utils import draw_link_frame
 
 
