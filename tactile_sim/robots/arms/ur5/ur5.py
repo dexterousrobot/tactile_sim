@@ -27,6 +27,7 @@ class UR5(BaseRobotArm):
         """
         Set some of the parameters used when controlling the UR5
         """
+        self.name = 'sim_ur5'
         self.max_force = 1000.0
         self.pos_gain = 1.0
         self.vel_gain = 1.0

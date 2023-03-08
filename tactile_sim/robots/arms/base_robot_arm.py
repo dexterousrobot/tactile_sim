@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+from tactile_sim.utils.pybullet_draw_utils import draw_link_frame
 
 
 class BaseRobotArm:
@@ -26,6 +27,10 @@ class BaseRobotArm:
         # set up the work frame
         self.set_workframe(workframe)
         self.set_tcp_lims(tcp_lims)
+
+    def close(self):
+        if self._pb.isConnected():
+            self._pb.disconnect()
 
     def reset(self):
         """
@@ -57,79 +62,6 @@ class BaseRobotArm:
         self.workframe_rpy = np.array(frame[3:])
         self.workframe_orn = np.array(self._pb.getQuaternionFromEuler(self.workframe_rpy))
 
-    def workframe_to_worldframe(self, pos, rpy):
-        """
-        Transforms a pose in work frame to a pose in world frame.
-        """
-
-        pos = np.array(pos)
-        rpy = np.array(rpy)
-        orn = np.array(self._pb.getQuaternionFromEuler(rpy))
-
-        worldframe_pos, worldframe_orn = self._pb.multiplyTransforms(self.workframe_pos, self.workframe_orn, pos, orn)
-        worldframe_rpy = self._pb.getEulerFromQuaternion(worldframe_orn)
-
-        return np.array(worldframe_pos), np.array(worldframe_rpy)
-
-    def worldframe_to_workframe(self, pos, rpy):
-        """
-        Transforms a pose in world frame to a pose in work frame.
-        """
-        pos = np.array(pos)
-        rpy = np.array(rpy)
-        orn = np.array(self._pb.getQuaternionFromEuler(rpy))
-
-        inv_workframe_pos, inv_workframe_orn = self._pb.invertTransform(self.workframe_pos, self.workframe_orn)
-        workframe_pos, workframe_orn = self._pb.multiplyTransforms(inv_workframe_pos, inv_workframe_orn, pos, orn)
-        workframe_rpy = self._pb.getEulerFromQuaternion(workframe_orn)
-
-        return np.array(workframe_pos), np.array(workframe_rpy)
-
-    def workvec_to_worldvec(self, workframe_vec):
-        """
-        Transforms a vector in work frame to a vector in world frame.
-        """
-        workframe_vec = np.array(workframe_vec)
-        rot_matrix = np.array(self._pb.getMatrixFromQuaternion(self.workframe_orn)).reshape(3, 3)
-        worldframe_vec = rot_matrix.dot(workframe_vec)
-
-        return np.array(worldframe_vec)
-
-    def worldvec_to_workvec(self, worldframe_vec):
-        """
-        Transforms a vector in world frame to a vector in work frame.
-        """
-        worldframe_vec = np.array(worldframe_vec)
-        inv_workframe_pos, inv_workframe_orn = self._pb.invertTransform(self.workframe_pos, self.workframe_orn)
-        rot_matrix = np.array(self._pb.getMatrixFromQuaternion(inv_workframe_orn)).reshape(3, 3)
-        workframe_vec = rot_matrix.dot(worldframe_vec)
-
-        return np.array(workframe_vec)
-
-    def workvel_to_worldvel(self, workframe_pos_vel, workframe_ang_vel):
-        """
-        Convert linear and angular velocities in workframe to worldframe.
-        """
-        rot_matrix = np.array(self._pb.getMatrixFromQuaternion(self.workframe_orn)).reshape(3, 3)
-
-        worldframe_pos_vel = rot_matrix.dot(workframe_pos_vel)
-        worldframe_ang_vel = rot_matrix.dot(workframe_ang_vel)
-
-        return worldframe_pos_vel, worldframe_ang_vel
-
-    def worldvel_to_workvel(self, worldframe_pos_vel, worldframe_ang_vel):
-        """
-        Convert linear and angular velocities in worldframe to workframe.
-        """
-
-        inv_workframe_pos, inv_workframe_orn = self._pb.invertTransform(self.workframe_pos, self.workframe_orn)
-        rot_matrix = np.array(self._pb.getMatrixFromQuaternion(inv_workframe_orn)).reshape(3, 3)
-
-        workframe_pos_vel = rot_matrix.dot(worldframe_pos_vel)
-        workframe_ang_vel = rot_matrix.dot(worldframe_ang_vel)
-
-        return workframe_pos_vel, workframe_ang_vel
-
     def set_tcp_lims(self, lims):
         """
         Used to limit the range of the TCP
@@ -143,7 +75,6 @@ class BaseRobotArm:
         cur_joint_states = self._pb.getJointStates(self.embodiment_id, self.control_joint_ids)
         cur_joint_pos = [cur_joint_states[i][0] for i in range(self.num_control_dofs)]
         cur_joint_vel = [cur_joint_states[i][1] for i in range(self.num_control_dofs)]
-
         return cur_joint_pos, cur_joint_vel
 
     def get_current_TCP_pos_vel_worldframe(self):
@@ -183,6 +114,26 @@ class BaseRobotArm:
             tcp_lin_vel_workframe,
             tcp_ang_vel_workframe,
         )
+
+    def get_tcp_pose(self):
+        """
+        Returns pose of the Tool Center Point in world frame
+        """
+        (
+                cur_TCP_pos,
+                cur_TCP_rpy,
+                _,
+                _,
+                _,
+        ) = self.get_current_TCP_pos_vel_workframe()
+        return np.array([*cur_TCP_pos, *cur_TCP_rpy])
+
+    def get_joint_angles(self):
+        """
+        Returns pose of the Tool Center Point in world frame
+        """
+        joint_pos, _ = self.get_current_joint_pos_vel()
+        return np.array(joint_pos)
 
     def compute_gravity_compensation(self):
         cur_joint_pos, cur_joint_vel = self.get_current_joint_pos_vel()
@@ -236,6 +187,29 @@ class BaseRobotArm:
         self.target_pos_worldframe = target_pos
         self.target_rpy_worldframe = target_rpy
         self.target_orn_worldframe = target_orn
+        self.target_joints = joint_poses
+
+    def direct_joints_move(self, joint_poses):
+        """
+        Go directly to a specified joint configuration
+        """
+
+        # set joint control
+        self._pb.setJointMotorControlArray(
+            self.embodiment_id,
+            self.control_joint_ids,
+            self._pb.POSITION_CONTROL,
+            targetPositions=joint_poses,
+            targetVelocities=[0] * self.num_control_dofs,
+            positionGains=[self.pos_gain] * self.num_control_dofs,
+            velocityGains=[self.vel_gain] * self.num_control_dofs,
+            forces=[self.max_force] * self.num_control_dofs,
+        )
+
+        # set target positions for blocking move
+        # self.target_pos_worldframe = target_pos
+        # self.target_rpy_worldframe = target_rpy
+        # self.target_orn_worldframe = target_orn
         self.target_joints = joint_poses
 
     def tcp_position_control(self, desired_delta_pose):
@@ -473,6 +447,54 @@ class BaseRobotArm:
             if (pos_error < pos_tol) and (orn_error < orn_tol) and (total_j_vel < jvel_tol):
                 break
 
+    def move_linear(self, targ_pose, quick_mode=False):
+        targ_pos, targ_rpy = targ_pose[:3], targ_pose[3:]
+        self.tcp_direct_workframe_move(targ_pos, targ_rpy)
+
+        if not quick_mode:
+            # slow but more realistic moves
+            self.blocking_move(
+                max_steps=10000,
+                constant_vel=0.00025,
+                pos_tol=5e-5,
+                orn_tol=5e-5,
+                jvel_tol=0.01,
+            )
+
+        else:
+            # fast but unrealistic moves (bigger_moves = worse performance)
+            self.blocking_move(
+                max_steps=1000,
+                constant_vel=None,
+                pos_tol=5e-5,
+                orn_tol=5e-5,
+                jvel_tol=0.01,
+            )
+
+    def move_joints(self, targ_joint_angles, quick_mode=False):
+
+        self.direct_joints_move(targ_joint_angles)
+
+        if not quick_mode:
+            # slow but more realistic moves
+            self.blocking_move(
+                max_steps=10000,
+                constant_vel=0.00025,
+                pos_tol=5e-5,
+                orn_tol=5e-5,
+                jvel_tol=0.01,
+            )
+
+        else:
+            # fast but unrealistic moves (bigger_moves = worse performance)
+            self.blocking_move(
+                max_steps=1000,
+                constant_vel=None,
+                pos_tol=5e-5,
+                orn_tol=5e-5,
+                jvel_tol=0.01,
+            )
+
     def check_TCP_pos_lims(self, pos, rpy):
         """
         cap the pos at the TCP limits specified
@@ -507,8 +529,91 @@ class BaseRobotArm:
         return capped_vels
 
     """
+    ==================== Transforms ====================
+    """
+
+    def workframe_to_worldframe(self, pos, rpy):
+        """
+        Transforms a pose in work frame to a pose in world frame.
+        """
+
+        pos = np.array(pos)
+        rpy = np.array(rpy)
+        orn = np.array(self._pb.getQuaternionFromEuler(rpy))
+
+        worldframe_pos, worldframe_orn = self._pb.multiplyTransforms(self.workframe_pos, self.workframe_orn, pos, orn)
+        worldframe_rpy = self._pb.getEulerFromQuaternion(worldframe_orn)
+
+        return np.array(worldframe_pos), np.array(worldframe_rpy)
+
+    def worldframe_to_workframe(self, pos, rpy):
+        """
+        Transforms a pose in world frame to a pose in work frame.
+        """
+        pos = np.array(pos)
+        rpy = np.array(rpy)
+        orn = np.array(self._pb.getQuaternionFromEuler(rpy))
+
+        inv_workframe_pos, inv_workframe_orn = self._pb.invertTransform(self.workframe_pos, self.workframe_orn)
+        workframe_pos, workframe_orn = self._pb.multiplyTransforms(inv_workframe_pos, inv_workframe_orn, pos, orn)
+        workframe_rpy = self._pb.getEulerFromQuaternion(workframe_orn)
+
+        return np.array(workframe_pos), np.array(workframe_rpy)
+
+    def workvec_to_worldvec(self, workframe_vec):
+        """
+        Transforms a vector in work frame to a vector in world frame.
+        """
+        workframe_vec = np.array(workframe_vec)
+        rot_matrix = np.array(self._pb.getMatrixFromQuaternion(self.workframe_orn)).reshape(3, 3)
+        worldframe_vec = rot_matrix.dot(workframe_vec)
+
+        return np.array(worldframe_vec)
+
+    def worldvec_to_workvec(self, worldframe_vec):
+        """
+        Transforms a vector in world frame to a vector in work frame.
+        """
+        worldframe_vec = np.array(worldframe_vec)
+        inv_workframe_pos, inv_workframe_orn = self._pb.invertTransform(self.workframe_pos, self.workframe_orn)
+        rot_matrix = np.array(self._pb.getMatrixFromQuaternion(inv_workframe_orn)).reshape(3, 3)
+        workframe_vec = rot_matrix.dot(worldframe_vec)
+
+        return np.array(workframe_vec)
+
+    def workvel_to_worldvel(self, workframe_pos_vel, workframe_ang_vel):
+        """
+        Convert linear and angular velocities in workframe to worldframe.
+        """
+        rot_matrix = np.array(self._pb.getMatrixFromQuaternion(self.workframe_orn)).reshape(3, 3)
+
+        worldframe_pos_vel = rot_matrix.dot(workframe_pos_vel)
+        worldframe_ang_vel = rot_matrix.dot(workframe_ang_vel)
+
+        return worldframe_pos_vel, worldframe_ang_vel
+
+    def worldvel_to_workvel(self, worldframe_pos_vel, worldframe_ang_vel):
+        """
+        Convert linear and angular velocities in worldframe to workframe.
+        """
+
+        inv_workframe_pos, inv_workframe_orn = self._pb.invertTransform(self.workframe_pos, self.workframe_orn)
+        rot_matrix = np.array(self._pb.getMatrixFromQuaternion(inv_workframe_orn)).reshape(3, 3)
+
+        workframe_pos_vel = rot_matrix.dot(worldframe_pos_vel)
+        workframe_ang_vel = rot_matrix.dot(worldframe_ang_vel)
+
+        return workframe_pos_vel, workframe_ang_vel
+
+    """
     ==================== Debug Tools ====================
     """
+
+    def draw_ee(self, lifetime=0.1):
+        draw_link_frame(self.embodiment_id, self.link_name_to_index["ee_link"], lifetime=lifetime)
+
+    def draw_tcp(self, lifetime=0.1):
+        draw_link_frame(self.embodiment_id, self.tcp_link_id, lifetime=lifetime)
 
     def print_joint_pos_vel(self):
         joint_pos, joint_vel = self.get_current_joint_pos_vel()

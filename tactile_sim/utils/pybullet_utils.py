@@ -1,14 +1,29 @@
 import pybullet as p
 import pybullet_utils.bullet_client as bc
+import pkgutil
+import numpy as np
+
 from tactile_sim.assets import add_assets_path
 
 
-def connect_pybullet(timestep):
+def connect_pybullet(timestep, show_gui=False):
     """
     Create a pyullet instance with set physics params.
     """
-    pb = bc.BulletClient(connection_mode=p.GUI)
-    pb.setGravity(0, 0, -10)
+    if show_gui:
+        pb = bc.BulletClient(connection_mode=p.GUI)
+        pb.configureDebugVisualizer(pb.COV_ENABLE_RGB_BUFFER_PREVIEW, 0)
+        pb.configureDebugVisualizer(pb.COV_ENABLE_DEPTH_BUFFER_PREVIEW, 0)
+        pb.configureDebugVisualizer(pb.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, 0)
+    else:
+        pb = bc.BulletClient(connection_mode=p.DIRECT)
+        egl = pkgutil.get_loader("eglRenderer")
+        if egl:
+            p.loadPlugin(egl.get_filename(), "_eglRendererPlugin")
+        else:
+            p.loadPlugin("eglRendererPlugin")
+
+    pb.setGravity(0, 0, -9.81)
     pb.setPhysicsEngineParameter(
         fixedTimeStep=timestep,
         numSolverIterations=300,
@@ -37,6 +52,42 @@ def load_standard_environment(pb):
         [0.50, 0.00, -0.625],
         [0.0, 0.0, 0.0, 1.0],
     )
+
+
+def load_stim(pb, stim_name, stim_pose, fixed_base=False, scale=1.0):
+    """
+    Load a stimulus at a given pose.
+    """
+    stim_pose = np.array(stim_pose)
+    stim_pos, stim_rpy = stim_pose[:3], stim_pose[3:]
+
+    stim_id = p.loadURDF(
+        add_assets_path(stim_name),  # TODO: fix
+        stim_pos,
+        pb.getQuaternionFromEuler(stim_rpy),
+        useFixedBase=fixed_base,
+        globalScaling=scale
+    )
+
+    # turn off collision when stim is fixed - not needed in static env
+    if fixed_base:
+        pb.setCollisionFilterGroupMask(stim_id, -1, 0, 0)
+
+    return stim_id
+
+
+def load_target_indicator(pb, target_pose):
+    target_pose = np.array(target_pose)
+    target_pos, target_rpy = target_pose[:3], target_pose[3:]
+    target_id = p.loadURDF(
+        add_assets_path("shared_assets/environment_objects/goal_indicators/sphere_indicator.urdf"),
+        target_pos,
+        pb.getQuaternionFromEuler(target_rpy),
+        useFixedBase=True,
+    )
+    p.changeVisualShape(target_id, -1, rgbaColor=[0, 1, 0, 0.5])
+    p.setCollisionFilterGroupMask(target_id, -1, 0, 0)
+    return target_id
 
 
 def set_debug_camera(pb, debug_camera_params):

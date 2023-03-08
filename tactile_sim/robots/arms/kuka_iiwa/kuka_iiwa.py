@@ -27,6 +27,7 @@ class KukaIiwa(BaseRobotArm):
         """
         Set some of the parameters used when controlling the Franka Panda
         """
+        self.name = 'sim_kuka_iiwa'
         self.max_force = 1000.0
         self.pos_gain = 1.0
         self.vel_gain = 1.0

@@ -5,7 +5,6 @@ from tactile_sim.assets import add_assets_path
 from tactile_sim.robots.arms import arm_mapping
 from tactile_sim.sensors.tactile_sensor import TactileSensor
 from tactile_sim.sensors.vision_sensor import VisionSensor
-from tactile_sim.utils.pybullet_draw_utils import draw_link_frame
 
 
 class ArmEmbodiment:
@@ -34,6 +33,10 @@ class ArmEmbodiment:
             tcp_lims=robot_arm_params['tcp_lims']
         )
 
+    def close(self):
+        if self._pb.isConnected():
+            self._pb.disconnect()
+
     def load_urdf(self):
         """
         Load the robot arm model into pybullet
@@ -57,7 +60,6 @@ class ArmEmbodiment:
             self.embodiment_id)
 
         # get the link and tcp IDs
-        self.ee_link_id = self.link_name_to_index["ee_link"]
         self.tcp_link_id = self.link_name_to_index["ee_link"]
 
     def create_link_joint_mappings(self, urdf_id):
@@ -90,12 +92,6 @@ class ArmEmbodiment:
     def full_reset(self):
         self.load_urdf()
         self.sensor.turn_off_collisions()
-
-    def draw_ee(self, lifetime=0.1):
-        draw_link_frame(self.embodiment_id, self.ee_link_id, lifetime=lifetime)
-
-    def draw_tcp(self, lifetime=0.1):
-        draw_link_frame(self.embodiment_id, self.tcp_link_id, lifetime=lifetime)
 
 
 class TactileArmEmbodiment(ArmEmbodiment):
@@ -164,7 +160,6 @@ class TactileArmEmbodiment(ArmEmbodiment):
             self.embodiment_id)
 
         # get the link and tcp IDs
-        self.ee_link_id = self.link_name_to_index["ee_link"]
         self.tcp_link_id = self.link_name_to_index["tcp_link"]
 
     def reset(self, reset_TCP_pos, reset_TCP_rpy):

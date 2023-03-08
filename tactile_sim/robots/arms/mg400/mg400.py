@@ -30,6 +30,7 @@ class MG400(BaseRobotArm):
         """
         Set some of the parameters used when controlling the mg400
         """
+        self.name = 'sim_mg400'
         self.max_force = 1000.0
         self.pos_gain = 1.0
         self.vel_gain = 1.0
@@ -51,19 +52,6 @@ class MG400(BaseRobotArm):
         # get the control and calculate joint ids in list form, useful for pb array methods
         self.control_joint_ids = [self.joint_name_to_index[name] for name in self.control_joint_names]
         self.num_control_dofs = len(self.control_joint_ids)
-
-        # self.link_4_1_id = self.link_name_to_index["link4_1"]
-        # self.link_4_2_id = self.link_name_to_index["link4_2"]
-        # self.link_5_id = self.link_name_to_index["link5"]
-        #
-        # self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.link_4_1_id, 0, 0)
-        # self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.link_4_2_id, 0, 0)
-        # self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.link_5_id, 0, 0)
-        # self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.tcp_link_id, 0, 0)
-        # self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.ee_link_id, 0, 0)
-
-        # self.print_joint_pos_vel()
-        # self.draw_TCP()
 
     def tcp_velocity_control(self, desired_vels):
         """

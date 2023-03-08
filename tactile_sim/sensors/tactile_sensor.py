@@ -209,7 +209,6 @@ class TactileSensor:
         # get the pose of the sensor body (where camera sits)
         sensor_body_pos, sensor_body_orn, _, _, _, _ = self._pb.getLinkState(
             self.embodiment_id, self.tactile_link_ids["body"], computeForwardKinematics=True
-            # self.embodiment_id, self.tcp_link_id, computeForwardKinematics=True
         )
 
         # get the camera frame relative to world frame
