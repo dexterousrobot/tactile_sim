@@ -13,8 +13,7 @@ class ArmEmbodiment:
         self,
         pb,
         workframe=[0.65, 0.0, 0.0525, -np.pi, 0.0, 0.0],
-        robot_arm_params={},
-        show_gui=True,
+        robot_arm_params={}
     ):
 
         self._pb = pb
@@ -105,8 +104,7 @@ class TactileArmEmbodiment(ArmEmbodiment):
         pb,
         workframe=[0.65, 0.0, 0.0525, -np.pi, 0.0, 0.0],
         robot_arm_params={},
-        tactile_sensor_params={},
-        show_gui=True,
+        tactile_sensor_params={}
     ):
 
         self._pb = pb
@@ -194,8 +192,7 @@ class VisualArmEmbodiment(ArmEmbodiment):
         pb,
         workframe=[0.65, 0.0, 0.0525, -np.pi, 0.0, 0.0],
         robot_arm_params={},
-        visual_sensor_params={},
-        show_gui=True,
+        visual_sensor_params={}
     ):
 
         self._pb = pb
@@ -237,8 +234,7 @@ class VisuoTactileArmEmbodiment(TactileArmEmbodiment):
         workframe=[0.65, 0.0, 0.0525, -np.pi, 0.0, 0.0],
         robot_arm_params={},
         tactile_sensor_params={},
-        visual_sensor_params={},
-        show_gui=True,
+        visual_sensor_params={}
     ):
 
         self._pb = pb

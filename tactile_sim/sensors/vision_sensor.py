@@ -3,7 +3,7 @@ import cv2
 
 
 def rgba_to_bgr(rgba):
-    return cv2.cvtColor(rgba[:, :, :3], cv2.COLOR_RGB2BGR)
+    return cv2.cvtColor(rgba.astype(np.uint8), cv2.COLOR_RGBA2BGR)
 
 
 def dep_to_bgr(dep):

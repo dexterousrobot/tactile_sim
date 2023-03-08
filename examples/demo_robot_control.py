@@ -16,7 +16,7 @@ from tactile_sim.assets.default_rest_poses import rest_poses_dict
 
 def create_embodiment(pb, embodiment_type):
     """
-    Create a robot arm with attached tactile sensor as our agent embodiment.
+    Create a robot arm with attached sensors as our agent embodiment.
     """
 
     # define sensor parameters
@@ -69,15 +69,13 @@ def create_embodiment(pb, embodiment_type):
     set_debug_camera(pb, visual_sensor_params)
 
     workframe = [0.35, 0.0, 0.1, -np.pi, 0.0, 0.0]
-    show_gui = True
 
     if embodiment_type == 'arm':
         # load a robot arm
         embodiment = ArmEmbodiment(
             pb,
             workframe=workframe,
-            robot_arm_params=robot_arm_params,
-            show_gui=show_gui,
+            robot_arm_params=robot_arm_params
         )
 
     elif embodiment_type == 'tactile_arm':
@@ -86,8 +84,7 @@ def create_embodiment(pb, embodiment_type):
             pb,
             workframe=workframe,
             robot_arm_params=robot_arm_params,
-            tactile_sensor_params=tactile_sensor_params,
-            show_gui=show_gui,
+            tactile_sensor_params=tactile_sensor_params
         )
 
     elif embodiment_type == 'visual_arm':
@@ -96,8 +93,7 @@ def create_embodiment(pb, embodiment_type):
             pb,
             workframe=workframe,
             robot_arm_params=robot_arm_params,
-            visual_sensor_params=visual_sensor_params,
-            show_gui=show_gui,
+            visual_sensor_params=visual_sensor_params
         )
 
     elif embodiment_type == 'visuotactile_arm':
@@ -107,8 +103,7 @@ def create_embodiment(pb, embodiment_type):
             workframe=workframe,
             robot_arm_params=robot_arm_params,
             tactile_sensor_params=tactile_sensor_params,
-            visual_sensor_params=visual_sensor_params,
-            show_gui=show_gui,
+            visual_sensor_params=visual_sensor_params
         )
 
     return embodiment
@@ -123,7 +118,7 @@ def demo_robot_control():
         '-e', '--embodiment_type',
         type=str,
         help="Choose task from ['arm', 'tactile_arm', 'visual_arm', 'visuotactile_arm'].",
-        default='visuotactile_arm'
+        default='visual_arm'
     )
     args = parser.parse_args()
     embodiment_type = args.embodiment_type
@@ -135,7 +130,7 @@ def demo_robot_control():
 
     # move to workframe
     embodiment.arm.tcp_direct_workframe_move([0.0, 0.0, 0.0], [0.0, 0.0, 0.0])
-    embodiment.arm.blocking_move(max_steps=10000, constant_vel=0.001)
+    embodiment.arm.blocking_move(max_steps=1000, constant_vel=0.001)
 
     while pb.isConnected():
 
