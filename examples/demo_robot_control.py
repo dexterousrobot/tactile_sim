@@ -35,7 +35,7 @@ def demo_robot_control():
         help="""Choose task from
                 ['standard_tactip', 'standard_digit', 'standard_digitac', 'mini_tactip', 'flat_tactip',
                 'right_angle_tactip', 'right_angle_digit', 'right_angle_digitac'].""",
-        default='right_angle_tactip'
+        default='standard_tactip'
     )
     args = parser.parse_args()
     embodiment_type = args.embodiment_type
@@ -71,13 +71,10 @@ def demo_robot_control():
         'show_vision': True
     }
 
-    workframe = [0.35, 0.0, 0.1, -np.pi, 0.0, 0.0]
-
     pb = connect_pybullet(timestep, show_gui)
     load_standard_environment(pb)
     embodiment = create_embodiment(
         pb,
-        workframe,
         embodiment_type,
         robot_arm_params,
         tactile_sensor_params,
@@ -89,8 +86,7 @@ def demo_robot_control():
         action_ids = add_user_control(pb)
 
     # move to workframe
-    embodiment.arm.tcp_direct_workframe_move([0.0, 0.0, 0.0], [0.0, 0.0, 0.0])
-    embodiment.arm.blocking_move(max_steps=1000, constant_vel=0.005)
+    embodiment.arm.move_linear([0.25, 0.0, 0.1, -np.pi, 0.0, 0.0])
 
     while pb.isConnected():
 
@@ -102,12 +98,11 @@ def demo_robot_control():
         else:
             a = np.zeros(6)
 
-        # apply the actions
-        embodiment.arm.apply_action(a)
+        # apply the actions TODO: Fix with updated robot arm
+        # embodiment.arm.apply_action(a)
 
         # embodiment.arm.draw_ee()
         # embodiment.arm.draw_tcp()
-        # embodiment.arm.draw_workframe()
         # embodiment.sensor.draw_sensor_frame()
         # embodiment.sensor.draw_camera_frame()
 
