@@ -6,7 +6,6 @@ class KukaIiwa(BaseRobotArm):
         self,
         pb,
         embodiment_id,
-        workframe,
         tcp_link_id,
         link_name_to_index,
         joint_name_to_index,
@@ -14,7 +13,7 @@ class KukaIiwa(BaseRobotArm):
         tcp_lims
     ):
         super(KukaIiwa, self).__init__(
-            pb, embodiment_id, workframe, tcp_link_id, link_name_to_index, joint_name_to_index, rest_poses, tcp_lims
+            pb, embodiment_id, tcp_link_id, link_name_to_index, joint_name_to_index, rest_poses, tcp_lims
         )
 
         # set info specific to arm

@@ -4,7 +4,7 @@ from tactile_sim.embodiments.embodiments import VisualArmEmbodiment
 from tactile_sim.embodiments.embodiments import VisuoTactileArmEmbodiment
 
 
-def create_embodiment(pb, workframe, embodiment_type, robot_arm_params, tactile_sensor_params, visual_sensor_params):
+def create_embodiment(pb, embodiment_type, robot_arm_params, tactile_sensor_params, visual_sensor_params):
     """
     Create a robot arm with attached sensors as our agent embodiment.
     """
@@ -13,7 +13,6 @@ def create_embodiment(pb, workframe, embodiment_type, robot_arm_params, tactile_
         # load a robot arm
         embodiment = ArmEmbodiment(
             pb,
-            workframe=workframe,
             robot_arm_params=robot_arm_params
         )
 
@@ -21,7 +20,6 @@ def create_embodiment(pb, workframe, embodiment_type, robot_arm_params, tactile_
         # load a robot arm with a tactile sensor attached
         embodiment = TactileArmEmbodiment(
             pb,
-            workframe=workframe,
             robot_arm_params=robot_arm_params,
             tactile_sensor_params=tactile_sensor_params
         )
@@ -30,7 +28,6 @@ def create_embodiment(pb, workframe, embodiment_type, robot_arm_params, tactile_
         # load a robot arm with a static visual sensor
         embodiment = VisualArmEmbodiment(
             pb,
-            workframe=workframe,
             robot_arm_params=robot_arm_params,
             visual_sensor_params=visual_sensor_params
         )
@@ -39,7 +36,6 @@ def create_embodiment(pb, workframe, embodiment_type, robot_arm_params, tactile_
         # load a robot arm with a tactile sensor attached and a static visual sensor
         embodiment = VisuoTactileArmEmbodiment(
             pb,
-            workframe=workframe,
             robot_arm_params=robot_arm_params,
             tactile_sensor_params=tactile_sensor_params,
             visual_sensor_params=visual_sensor_params

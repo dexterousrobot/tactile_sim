@@ -11,7 +11,6 @@ class ArmEmbodiment:
     def __init__(
         self,
         pb,
-        workframe=[0.65, 0.0, 0.0525, -np.pi, 0.0, 0.0],
         robot_arm_params={}
     ):
 
@@ -25,7 +24,6 @@ class ArmEmbodiment:
         self.arm = arm_mapping[self.arm_type](
             pb,
             embodiment_id=self.embodiment_id,
-            workframe=workframe,
             tcp_link_id=self.tcp_link_id,
             link_name_to_index=self.link_name_to_index,
             joint_name_to_index=self.joint_name_to_index,
@@ -98,7 +96,6 @@ class TactileArmEmbodiment(ArmEmbodiment):
     def __init__(
         self,
         pb,
-        workframe=[0.65, 0.0, 0.0525, -np.pi, 0.0, 0.0],
         robot_arm_params={},
         tactile_sensor_params={}
     ):
@@ -114,7 +111,6 @@ class TactileArmEmbodiment(ArmEmbodiment):
         self.arm = arm_mapping[self.arm_type](
             pb,
             embodiment_id=self.embodiment_id,
-            workframe=workframe,
             tcp_link_id=self.tcp_link_id,
             link_name_to_index=self.link_name_to_index,
             joint_name_to_index=self.joint_name_to_index,
@@ -185,7 +181,6 @@ class VisualArmEmbodiment(ArmEmbodiment):
     def __init__(
         self,
         pb,
-        workframe=[0.65, 0.0, 0.0525, -np.pi, 0.0, 0.0],
         robot_arm_params={},
         visual_sensor_params={}
     ):
@@ -200,7 +195,6 @@ class VisualArmEmbodiment(ArmEmbodiment):
         self.arm = arm_mapping[self.arm_type](
             pb,
             embodiment_id=self.embodiment_id,
-            workframe=workframe,
             tcp_link_id=self.tcp_link_id,
             link_name_to_index=self.link_name_to_index,
             joint_name_to_index=self.joint_name_to_index,
@@ -226,7 +220,6 @@ class VisuoTactileArmEmbodiment(TactileArmEmbodiment):
     def __init__(
         self,
         pb,
-        workframe=[0.65, 0.0, 0.0525, -np.pi, 0.0, 0.0],
         robot_arm_params={},
         tactile_sensor_params={},
         visual_sensor_params={}
@@ -243,7 +236,6 @@ class VisuoTactileArmEmbodiment(TactileArmEmbodiment):
         self.arm = arm_mapping[self.arm_type](
             pb,
             embodiment_id=self.embodiment_id,
-            workframe=workframe,
             tcp_link_id=self.tcp_link_id,
             link_name_to_index=self.link_name_to_index,
             joint_name_to_index=self.joint_name_to_index,
