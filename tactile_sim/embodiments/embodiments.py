@@ -156,7 +156,7 @@ class TactileArmEmbodiment(ArmEmbodiment):
             self.embodiment_id)
 
         # get the link and tcp IDs
-        self.tcp_link_id = self.link_name_to_index["tcp_link"]
+        self.tcp_link_id = self.link_name_to_index["ee_link"]
 
     def reset(self, reset_TCP_pos, reset_TCP_rpy):
         """
