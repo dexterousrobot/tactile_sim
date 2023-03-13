@@ -102,27 +102,29 @@ def set_debug_camera(pb, debug_camera_params):
     )
 
 
-def add_user_control(pb):
-    # create controllable parameters on GUI
-    action_ids = []
-    min_action, max_action = -0.25, 0.25
+def add_tcp_user_control(pb):
+    """create controllable parameters on GUI"""
 
-    action_ids.append(
-        pb.addUserDebugParameter("dx", min_action, max_action, 0)
-    )
-    action_ids.append(
-        pb.addUserDebugParameter("dy", min_action, max_action, 0)
-    )
-    action_ids.append(
-        pb.addUserDebugParameter("dz", min_action, max_action, 0)
-    )
-    action_ids.append(
-        pb.addUserDebugParameter("dRX", min_action, max_action, 0)
-    )
-    action_ids.append(
-        pb.addUserDebugParameter("dRY", min_action, max_action, 0)
-    )
-    action_ids.append(
-        pb.addUserDebugParameter("dRZ", min_action, max_action, 0)
-    )
+    min_pos_action, max_pos_action = -0.01, 0.01
+    min_rot_action, max_rot_action = np.deg2rad(-5.0), np.deg2rad(5.0)
+
+    action_ids = []
+    action_ids.append(pb.addUserDebugParameter("dx", min_pos_action, max_pos_action, 0))
+    action_ids.append(pb.addUserDebugParameter("dy", min_pos_action, max_pos_action, 0))
+    action_ids.append(pb.addUserDebugParameter("dz", min_pos_action, max_pos_action, 0))
+    action_ids.append(pb.addUserDebugParameter("dRX", min_rot_action, max_rot_action, 0))
+    action_ids.append(pb.addUserDebugParameter("dRY", min_rot_action, max_rot_action, 0))
+    action_ids.append(pb.addUserDebugParameter("dRZ", min_rot_action, max_rot_action, 0))
+    return action_ids
+
+
+def add_joint_user_control(pb, control_joints):
+    """create controllable parameters on GUI"""
+
+    min_action, max_action = np.deg2rad(-1.0), np.deg2rad(1.0)
+
+    action_ids = []
+    for joint_name in control_joints:
+        action_ids.append(pb.addUserDebugParameter(joint_name, min_action, max_action, 0))
+
     return action_ids

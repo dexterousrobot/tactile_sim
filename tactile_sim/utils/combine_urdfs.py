@@ -146,60 +146,60 @@ if __name__ == '__main__':
 
     # adjust_all_materials("/home/alex/DexterousRobotics/tactile_sim/tactile_sim/assets/embodiment_assets/combined_urdfs")
 
-    save_urdf = True
+    save_urdf = False
 
     # standard tactip
     # combine_urdfs('ur5', 'standard_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
-    # combine_urdfs('franka_panda', 'standard_tactip', [0, 0.0, 0.0], [0.0, 0.0, -np.pi/2], save_urdf=save_urdf)
+    combine_urdfs('franka_panda', 'standard_tactip', [0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('kuka_iiwa', 'standard_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('cr3', 'standard_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('mg400', 'standard_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
 
     # standard digit
     # combine_urdfs('ur5', 'standard_digit', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
-    # combine_urdfs('franka_panda', 'standard_digit', [0, 0.0, 0.0], [0.0, 0.0, -np.pi/2], save_urdf=save_urdf)
+    combine_urdfs('franka_panda', 'standard_digit', [0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('kuka_iiwa', 'standard_digit', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('cr3', 'standard_digit', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('mg400', 'standard_digit', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
 
     # standard digitac
     # combine_urdfs('ur5', 'standard_digitac', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
-    # combine_urdfs('franka_panda', 'standard_digitac', [0, 0.0, 0.0], [0.0, 0.0, -np.pi/2], save_urdf=save_urdf)
+    combine_urdfs('franka_panda', 'standard_digitac', [0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('kuka_iiwa', 'standard_digitac', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('cr3', 'standard_digitac', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('mg400', 'standard_digitac', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
 
     # mini tactip
     # combine_urdfs('ur5', 'mini_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
-    # combine_urdfs('franka_panda', 'mini_tactip', [0, 0.0, 0.0], [0.0, 0.0, -np.pi/2], save_urdf=save_urdf)
+    combine_urdfs('franka_panda', 'mini_tactip', [0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('kuka_iiwa', 'mini_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('cr3', 'mini_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('mg400', 'mini_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
 
     # flat tactip
     # combine_urdfs('ur5', 'flat_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
-    # combine_urdfs('franka_panda', 'flat_tactip', [0, 0.0, 0.0], [0.0, 0.0, -np.pi/2], save_urdf=save_urdf)
+    combine_urdfs('franka_panda', 'flat_tactip', [0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('kuka_iiwa', 'flat_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('cr3', 'flat_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
     # combine_urdfs('mg400', 'flat_tactip', [0.0, 0.0, 0.0], [-np.pi, 0.0, np.pi], save_urdf=save_urdf)
 
     # right angle tactips
     # combine_urdfs('ur5', 'right_angle_tactip', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
-    # combine_urdfs('franka_panda', 'right_angle_tactip', [0, 0.005, 0.06], [0.0, np.pi/2, np.pi], save_urdf=save_urdf)
+    combine_urdfs('franka_panda', 'right_angle_tactip', [0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
     # combine_urdfs('kuka_iiwa', 'right_angle_tactip', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
     # combine_urdfs('cr3', 'right_angle_tactip', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
     # combine_urdfs('mg400', 'right_angle_tactip', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi/2], save_urdf=save_urdf)
 
     # right angle digits
     # combine_urdfs('ur5', 'right_angle_digit', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
-    # combine_urdfs('franka_panda', 'right_angle_digit', [0, 0.005, 0.06], [0.0, np.pi/2, np.pi], save_urdf=save_urdf)
+    combine_urdfs('franka_panda', 'right_angle_digit', [0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
     # combine_urdfs('kuka_iiwa', 'right_angle_digit', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
     # combine_urdfs('cr3', 'right_angle_digit', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
     # combine_urdfs('mg400', 'right_angle_digit', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi/2], save_urdf=save_urdf)
 
     # right angle digitacs
-    combine_urdfs('ur5', 'right_angle_digitac', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
-    combine_urdfs('franka_panda', 'right_angle_digitac', [0, 0.005, 0.06], [0.0, np.pi/2, np.pi], save_urdf=save_urdf)
-    combine_urdfs('kuka_iiwa', 'right_angle_digitac', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
-    combine_urdfs('cr3', 'right_angle_digitac', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
-    combine_urdfs('mg400', 'right_angle_digitac', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi/2], save_urdf=save_urdf)
+    # combine_urdfs('ur5', 'right_angle_digitac', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
+    combine_urdfs('franka_panda', 'right_angle_digitac', [0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
+    # combine_urdfs('kuka_iiwa', 'right_angle_digitac', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
+    # combine_urdfs('cr3', 'right_angle_digitac', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi], save_urdf=save_urdf)
+    # combine_urdfs('mg400', 'right_angle_digitac', [0.0, 0.005, -0.06], [-np.pi/2, -np.pi/2, np.pi/2], save_urdf=save_urdf)

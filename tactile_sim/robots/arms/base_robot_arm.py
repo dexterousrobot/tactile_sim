@@ -21,6 +21,7 @@ class BaseRobotArm:
         self.tcp_link_id = tcp_link_id
         self.link_name_to_index = link_name_to_index
         self.joint_name_to_index = joint_name_to_index
+        self.tcp_lims = tcp_lims
 
     def close(self):
         if self._pb.isConnected():
@@ -117,16 +118,18 @@ class BaseRobotArm:
             forces=grav_comp_torque,
         )
 
-    def set_target_tcp_pose(self, target_pos, target_rpy):
+    def set_target_tcp_pose(self, target_pose):
         """
-        Go directly to a position specified relative to the workframe
+        Go directly to a tcp position specified relative to the worldframe.
+        - TCP limits are imposed.
         """
 
         # transform from work_frame to world_frame
+        target_pos, target_rpy = target_pose[:3], target_pose[3:]
         target_orn = np.array(self._pb.getQuaternionFromEuler(target_rpy))
 
         # get target joint poses through IK
-        joint_poses = self._pb.calculateInverseKinematics(
+        joint_positions = self._pb.calculateInverseKinematics(
             self.embodiment_id,
             self.tcp_link_id,
             target_pos,
@@ -135,41 +138,110 @@ class BaseRobotArm:
             maxNumIterations=100,
             residualThreshold=1e-8,
         )
+        joint_velocities = np.array([0] * self.num_control_dofs)
 
         # set joint control
         self._pb.setJointMotorControlArray(
             self.embodiment_id,
             self.control_joint_ids,
             self._pb.POSITION_CONTROL,
-            targetPositions=joint_poses,
-            targetVelocities=[0] * self.num_control_dofs,
+            targetPositions=joint_positions,
+            targetVelocities=joint_velocities,
             positionGains=[self.pos_gain] * self.num_control_dofs,
             velocityGains=[self.vel_gain] * self.num_control_dofs,
             forces=[self.max_force] * self.num_control_dofs,
         )
 
         # set target positions for blocking move
-        self.target_joints = np.array(joint_poses)
+        self._target_joints_positions = np.array(joint_positions)
 
-    def set_target_joints(self, joint_poses):
+    def set_target_tcp_velocities(self, target_vels):
         """
-        Go directly to a specified joint configuration
+        Set desired tcp velocity.
+        - TCP limits are imposed.
         """
+        # check that this won't push the TCP out of limits
+        # zero any velocities that will
+        target_vels = self.check_TCP_vel_lims(np.array(target_vels))
+
+        # get current joint positions and velocities
+        q, qd = self.get_current_joint_pos_vel()
+
+        # calculate the jacobian for tcp link
+        # used to map joing velocities to TCP velocities
+        jac_t, jac_r = self._pb.calculateJacobian(
+            self.embodiment_id,
+            self.tcp_link_id,
+            [0, 0, 0],
+            q,
+            qd,
+            [0] * self.num_control_dofs,
+        )
+
+        # merge into one jacobian matrix
+        jac = np.concatenate([np.array(jac_t), np.array(jac_r)])
+
+        # invert the jacobian to map from tcp velocities to joint velocities
+        # be careful of singnularities and non square matrices
+        # use pseudo-inverse when this is the case
+        # this is all the time for 7 dof arms like panda
+        if jac.shape[1] > np.linalg.matrix_rank(jac.T):
+            inv_jac = np.linalg.pinv(jac)
+        else:
+            inv_jac = np.linalg.inv(jac)
+
+        # convert desired velocities from cart space to joint space
+        joint_vels = np.matmul(inv_jac, target_vels)
+
+        # apply joint space velocities
+        self._pb.setJointMotorControlArray(
+            self.embodiment_id,
+            self.control_joint_ids,
+            self._pb.VELOCITY_CONTROL,
+            targetVelocities=joint_vels,
+            velocityGains=[self.vel_gain] * self.num_control_dofs,
+            forces=[self.max_force] * self.num_control_dofs,
+        )
+
+        # set target positions for blocking move
+        self._target_joints_velocities = np.array(joint_vels)
+
+    def set_target_joint_positions(self, joint_positions):
+        """
+        Go directly to a specified joint configuration.
+        - Only limits set in URDFs are imposed.
+        """
+        joint_velocities = np.array([0] * self.num_control_dofs)
 
         # set joint control
         self._pb.setJointMotorControlArray(
             self.embodiment_id,
             self.control_joint_ids,
             self._pb.POSITION_CONTROL,
-            targetPositions=joint_poses,
-            targetVelocities=[0] * self.num_control_dofs,
+            targetPositions=joint_positions,
+            targetVelocities=joint_velocities,
             positionGains=[self.pos_gain] * self.num_control_dofs,
             velocityGains=[self.vel_gain] * self.num_control_dofs,
             forces=[self.max_force] * self.num_control_dofs,
         )
 
         # set target positions for blocking move
-        self.target_joints = np.array(joint_poses)
+        self._target_joints_positions = np.array(joint_positions)
+
+    def set_target_joint_velocities(self, joint_velocities):
+        """
+        Set the desired joint velicities.
+        - Only limits set in URDFs are imposed.
+        """
+        self._pb.setJointMotorControlArray(
+            self.embodiment_id,
+            self.control_joint_ids,
+            self._pb.VELOCITY_CONTROL,
+            targetVelocities=joint_velocities,
+            positionGains=[self.pos_gain] * self.num_control_dofs,
+            velocityGains=[self.vel_gain] * self.num_control_dofs,
+            forces=[self.max_force] * self.num_control_dofs,
+        )
 
     def step_sim(self):
         """
@@ -182,7 +254,7 @@ class BaseRobotArm:
         # step the simulation
         self._pb.stepSimulation()
 
-    def blocking_move(
+    def blocking_position_move(
         self,
         max_steps=1000,
         constant_vel=None,
@@ -194,7 +266,7 @@ class BaseRobotArm:
         number of steps has been reached
         """
         # get target position
-        targ_j_pos = self.target_joints
+        targ_j_pos = self._target_joints_positions
 
         for i in range(max_steps):
 
@@ -238,18 +310,33 @@ class BaseRobotArm:
             self.step_sim()
 
             # calc totoal velocity
-            j_vel_err = np.sum(np.abs(cur_j_vel))
             j_pos_err = np.sum(np.abs(targ_j_pos - cur_j_pos))
+            j_vel_err = np.sum(np.abs(cur_j_vel))
 
             # break if the pose error is small enough
             # and the velocity is low enough
             if (j_pos_err < j_pos_tol) and (j_vel_err < j_vel_tol):
                 break
 
-    def apply_blocking_move(self, quick_mode=False):
+    def blocking_velocity_move(
+        self,
+        blocking_steps=100
+    ):
+        """
+        step the simulation until a target position has been reached or the max
+        number of steps has been reached
+        """
+        for i in range(blocking_steps):
+            # step the simulation
+            self.step_sim()
+
+    def apply_blocking_velocity_move(self, blocking_steps):
+        self.blocking_velocity_move(blocking_steps=blocking_steps)
+
+    def apply_blocking_position_move(self, quick_mode=False):
         if not quick_mode:
             # slow but more realistic moves
-            self.blocking_move(
+            self.blocking_position_move(
                 max_steps=10000,
                 constant_vel=0.00025,
                 j_pos_tol=1e-6,
@@ -258,7 +345,7 @@ class BaseRobotArm:
 
         else:
             # fast but unrealistic moves (bigger_moves = worse performance)
-            self.blocking_move(
+            self.blocking_position_move(
                 max_steps=1000,
                 constant_vel=None,
                 j_pos_tol=1e-6,
@@ -266,13 +353,20 @@ class BaseRobotArm:
             )
 
     def move_linear(self, targ_pose, quick_mode=False):
-        targ_pos, targ_rpy = targ_pose[:3], targ_pose[3:]
-        self.set_target_tcp_pose(targ_pos, targ_rpy)
-        self.apply_blocking_move(quick_mode=quick_mode)
+        self.set_target_tcp_pose(targ_pose)
+        self.apply_blocking_position_move(quick_mode=quick_mode)
+
+    def move_linear_vel(self, targ_vels, blocking_steps=100):
+        self.set_target_tcp_velocities(targ_vels)
+        self.apply_blocking_velocity_move(blocking_steps=blocking_steps)
 
     def move_joints(self, targ_joint_angles, quick_mode=False):
-        self.set_target_joints(targ_joint_angles)
-        self.apply_blocking_move(quick_mode=quick_mode)
+        self.set_target_joint_positions(targ_joint_angles)
+        self.apply_blocking_position_move(quick_mode=quick_mode)
+
+    def move_joints_vel(self, targ_vels, blocking_steps=100):
+        self.set_target_joint_velocities(targ_vels)
+        self.apply_blocking_velocity_move(blocking_steps=blocking_steps)
 
     def check_TCP_pos_lims(self, pos, rpy):
         """
@@ -282,6 +376,30 @@ class BaseRobotArm:
         rpy = np.clip(rpy, self.tcp_lims[3:, 0], self.tcp_lims[3:, 1])
         return pos, rpy
 
+    def check_TCP_vel_lims(self, vels):
+        """
+        check whether action will take TCP outside of limits,
+        zero any velocities that will.
+        """
+        cur_tcp_pos, cur_tcp_rpy, _, _, _ = self.get_current_TCP_pos_vel()
+
+        # get bool arrays for if limits are exceeded and if velocity is in
+        # the direction that's exceeded
+        exceed_pos_llims = np.logical_and(cur_tcp_pos < self.tcp_lims[:3, 0], vels[:3] < 0)
+        exceed_pos_ulims = np.logical_and(cur_tcp_pos > self.tcp_lims[:3, 1], vels[:3] > 0)
+        exceed_rpy_llims = np.logical_and(cur_tcp_rpy < self.tcp_lims[3:, 0], vels[3:] < 0)
+        exceed_rpy_ulims = np.logical_and(cur_tcp_rpy > self.tcp_lims[3:, 1], vels[3:] > 0)
+
+        # combine all bool arrays into one
+        exceeded_pos = np.logical_or(exceed_pos_llims, exceed_pos_ulims)
+        exceeded_rpy = np.logical_or(exceed_rpy_llims, exceed_rpy_ulims)
+        exceeded = np.concatenate([exceeded_pos, exceeded_rpy])
+
+        # cap the velocities at 0 if limits are exceeded
+        capped_vels = np.array(vels)
+        capped_vels[np.array(exceeded)] = 0
+
+        return capped_vels
     """
     ==================== Debug Tools ====================
     """

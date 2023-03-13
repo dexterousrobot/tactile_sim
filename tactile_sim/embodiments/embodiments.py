@@ -1,5 +1,4 @@
 import os
-import numpy as np
 
 from tactile_sim.assets import add_assets_path
 from tactile_sim.robots.arms import arm_mapping

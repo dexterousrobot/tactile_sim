@@ -3,10 +3,11 @@ import numpy as np
 import argparse
 
 
-from tactile_sim.utils.pybullet_utils import connect_pybullet
-from tactile_sim.utils.pybullet_utils import load_standard_environment
-from tactile_sim.utils.pybullet_utils import set_debug_camera
-from tactile_sim.utils.pybullet_utils import add_user_control
+from tactile_sim.utils.setup_pb_utils import connect_pybullet
+from tactile_sim.utils.setup_pb_utils import load_standard_environment
+from tactile_sim.utils.setup_pb_utils import set_debug_camera
+from tactile_sim.utils.setup_pb_utils import add_tcp_user_control
+from tactile_sim.utils.setup_pb_utils import add_joint_user_control
 from tactile_sim.embodiments import create_embodiment
 from tactile_sim.assets.default_rest_poses import rest_poses_dict
 
@@ -37,10 +38,22 @@ def demo_robot_control():
                 'right_angle_tactip', 'right_angle_digit', 'right_angle_digitac'].""",
         default='standard_tactip'
     )
+    parser.add_argument(
+        '-c', '--control_mode',
+        type=str,
+        help="""Choose task from
+                ['tcp_position_control', 'tcp_velocity_control', 'joint_position_control', 'joint_velocity_control'].""",
+        default='tcp_position_control'
+    )
     args = parser.parse_args()
     embodiment_type = args.embodiment_type
     arm_type = args.arm_type
     sensor_type = args.sensor_type
+    control_mode = args.control_mode
+
+    if control_mode not in ['tcp_position_control', 'tcp_velocity_control',
+                            'joint_position_control', 'joint_velocity_control']:
+        raise ValueError(f'Incorrect control_mode specified: {control_mode}')
 
     # define sensor parameters
     robot_arm_params = {
@@ -55,7 +68,7 @@ def demo_robot_control():
         "dynamics": {},  # {'stiffness': 50, 'damping': 100, 'friction': 10.0},
         "image_size": [128, 128],
         "turn_off_border": False,
-        "show_tactile": True,
+        "show_tactile": False,
     }
 
     # set debug camera position
@@ -68,7 +81,7 @@ def demo_robot_control():
         'fov': 75.0,
         'near_val': 0.1,
         'far_val': 100.0,
-        'show_vision': True
+        'show_vision': False
     }
 
     pb = connect_pybullet(timestep, show_gui)
@@ -83,25 +96,50 @@ def demo_robot_control():
     set_debug_camera(pb, visual_sensor_params)
 
     if show_gui:
-        action_ids = add_user_control(pb)
+        if control_mode in ['tcp_position_control', 'tcp_velocity_control']:
+            action_ids = add_tcp_user_control(pb)
+        elif control_mode in ['joint_position_control', 'joint_velocity_control']:
+            action_ids = add_joint_user_control(pb, embodiment.arm.control_joint_names)
 
-    # move to workframe
-    embodiment.arm.move_linear([0.25, 0.0, 0.1, -np.pi, 0.0, 0.0])
+    # set initial values
+    targ_tcp_pose = np.array([0.25, 0.0, 0.1, -np.pi, 0.0, 0.0])
+    targ_tcp_vels = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    targ_joint_positions = np.array(embodiment.arm.rest_poses[embodiment.arm.control_joint_ids])
+    targ_joint_vels = np.array([0.0]*embodiment.arm.num_control_dofs)
+
+    # move to initial pose
+    if control_mode in ['tcp_position_control', 'tcp_velocity_control']:
+        embodiment.arm.move_linear(targ_tcp_pose)
+        action = np.zeros_like(targ_tcp_pose)
+    elif control_mode in ['joint_position_control', 'joint_velocity_control']:
+        embodiment.arm.move_joints(targ_joint_positions)
+        action = np.zeros_like(targ_joint_positions)
 
     while pb.isConnected():
 
         # get an action from gui interface
         if show_gui:
-            a = []
+            action = []
             for action_id in action_ids:
-                a.append(pb.readUserDebugParameter(action_id))
-        else:
-            a = np.zeros(6)
+                action.append(pb.readUserDebugParameter(action_id))
 
-        # apply the actions TODO: Fix with updated robot arm
-        # embodiment.arm.apply_action(a)
+        if control_mode == 'tcp_position_control':
+            targ_tcp_pose += action
+            embodiment.arm.move_linear(targ_tcp_pose)
 
-        # embodiment.arm.draw_ee()
+        elif control_mode == 'tcp_velocity_control':
+            targ_tcp_vels = action
+            embodiment.arm.move_linear_vel(targ_tcp_vels)
+
+        elif control_mode == 'joint_position_control':
+            targ_joint_positions += action
+            embodiment.arm.move_joints(targ_joint_positions)
+
+        elif control_mode == 'joint_velocity_control':
+            targ_joint_vels = action
+            embodiment.arm.move_joints_vel(targ_joint_vels)
+
+        embodiment.arm.draw_ee()
         # embodiment.arm.draw_tcp()
         # embodiment.sensor.draw_sensor_frame()
         # embodiment.sensor.draw_camera_frame()

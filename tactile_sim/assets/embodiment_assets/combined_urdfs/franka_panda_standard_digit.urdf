@@ -185,7 +185,7 @@
 	</link>
 	<link name="ee_link">
 		<inertial>
-			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+			<origin rpy="-3.14000 -0.00000 1.57000" xyz="0.00000 0.00000 0.00000"/>
 			<mass value="0.00000"/>
 			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
 		</inertial>
@@ -201,7 +201,7 @@
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<sphere radius="0.01000"/>
+				<sphere radius="0.00100"/>
 			</geometry>
 		</collision>
 	</link>
@@ -332,14 +332,14 @@
 		<parent link="panda_link7"/>
 		<child link="ee_link"/>
 		<dynamics damping="1.0" friction="0.0001"/>
-		<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.10700"/>
+		<origin rpy="3.14000 -0.00000 1.57000" xyz="0.00000 0.00000 0.10700"/>
 		<axis xyz="0.00000 0.00000 0.00000"/>
 	</joint>
 	<joint name="joint_dummy1" type="fixed">
 		<parent link="ee_link"/>
 		<child link="digit_body_link"/>
 		<dynamics damping="1.0" friction="0.0001"/>
-		<origin rpy="0.00000 0.00000 -1.57080" xyz="0.00000 0.00000 0.00000"/>
+		<origin rpy="-3.14159 0.00000 3.14159" xyz="0.00000 0.00000 0.00000"/>
 		<axis xyz="0.00000 0.00000 1.00000"/>
 	</joint>
 	<joint name="digit_tip_to_body" type="fixed">

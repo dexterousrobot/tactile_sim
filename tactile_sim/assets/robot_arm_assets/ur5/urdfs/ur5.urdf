@@ -239,12 +239,6 @@
       </link>
 
       <!-- End Effector -->
-      <joint name="ee_joint" type="fixed">
-        <parent link="wrist_3_link"/>
-        <child link="ee_link"/>
-        <origin rpy="1.57 3.14 0.0" xyz="0.0 0.0823 0.0"/>
-      </joint>
-
       <link name="ee_link">
         <visual>
           <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -265,5 +259,10 @@
           <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
         </inertial>
       </link>
-      
+
+      <joint name="ee_joint" type="fixed">
+        <parent link="wrist_3_link"/>
+        <child link="ee_link"/>
+        <origin rpy="1.57 3.14 0.0" xyz="0.0 0.0823 0.0"/>
+      </joint>
 </robot>
