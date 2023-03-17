@@ -16,6 +16,11 @@ class ArmEmbodiment:
         self._pb = pb
         self.arm_type = robot_arm_params["type"]
 
+        if "tcp_link_name" in robot_arm_params:
+            self.tcp_link_name = robot_arm_params["tcp_link_name"]
+        else:
+            self.tcp_link_name = "ee_link"
+
         # load the urdf file
         self.load_urdf()
 
@@ -27,7 +32,6 @@ class ArmEmbodiment:
             link_name_to_index=self.link_name_to_index,
             joint_name_to_index=self.joint_name_to_index,
             rest_poses=robot_arm_params['rest_poses'],
-            tcp_lims=robot_arm_params['tcp_lims']
         )
 
     def close(self):
@@ -57,7 +61,7 @@ class ArmEmbodiment:
             self.embodiment_id)
 
         # get the link and tcp IDs
-        self.tcp_link_id = self.link_name_to_index["ee_link"]
+        self.tcp_link_id = self.link_name_to_index[self.tcp_link_name]
 
     def create_link_joint_mappings(self, urdf_id):
 
@@ -103,6 +107,11 @@ class TactileArmEmbodiment(ArmEmbodiment):
         self.arm_type = robot_arm_params["type"]
         self.tactile_sensor_type = tactile_sensor_params["type"]
 
+        if "tcp_link_name" in robot_arm_params:
+            self.tcp_link_name = robot_arm_params["tcp_link_name"]
+        else:
+            self.tcp_link_name = "ee_link"
+
         # load the urdf file
         self.load_urdf()
 
@@ -114,14 +123,12 @@ class TactileArmEmbodiment(ArmEmbodiment):
             link_name_to_index=self.link_name_to_index,
             joint_name_to_index=self.joint_name_to_index,
             rest_poses=robot_arm_params['rest_poses'],
-            tcp_lims=robot_arm_params['tcp_lims']
         )
 
         # connect a tactile sensor
         self.tactile_sensor = TactileSensor(
             pb,
             embodiment_id=self.embodiment_id,
-            tcp_link_id=self.tcp_link_id,
             link_name_to_index=self.link_name_to_index,
             joint_name_to_index=self.joint_name_to_index,
             image_size=tactile_sensor_params["image_size"],
@@ -145,7 +152,6 @@ class TactileArmEmbodiment(ArmEmbodiment):
             "combined_urdfs",
             self.arm_type + "_" + self.tactile_sensor_type + ".urdf",
         )
-
         self.embodiment_id = self._pb.loadURDF(
             add_assets_path(asset_name), self.base_pos, self.base_orn, useFixedBase=True
         )
@@ -155,9 +161,9 @@ class TactileArmEmbodiment(ArmEmbodiment):
             self.embodiment_id)
 
         # get the link and tcp IDs
-        self.tcp_link_id = self.link_name_to_index["ee_link"]
+        self.tcp_link_id = self.link_name_to_index[self.tcp_link_name]
 
-    def reset(self, reset_TCP_pos, reset_TCP_rpy):
+    def reset(self, reset_tcp_pose):
         """
         Reset the pose of the arm and sensor
         """
@@ -165,8 +171,7 @@ class TactileArmEmbodiment(ArmEmbodiment):
         self.tactile_sensor.reset()
 
         # move to the initial position
-        self.arm.tcp_direct_workframe_move(reset_TCP_pos, reset_TCP_rpy)
-        self.blocking_move(max_steps=1000, constant_vel=0.001)
+        self.arm.move_linear(reset_tcp_pose, quick_mode=True)
 
     def full_reset(self):
         self.load_urdf()
@@ -187,6 +192,11 @@ class VisualArmEmbodiment(ArmEmbodiment):
         self._pb = pb
         self.arm_type = robot_arm_params["type"]
 
+        if "tcp_link_name" in robot_arm_params:
+            self.tcp_link_name = robot_arm_params["tcp_link_name"]
+        else:
+            self.tcp_link_name = "ee_link"
+
         # load the urdf file
         self.load_urdf()
 
@@ -198,7 +208,6 @@ class VisualArmEmbodiment(ArmEmbodiment):
             link_name_to_index=self.link_name_to_index,
             joint_name_to_index=self.joint_name_to_index,
             rest_poses=robot_arm_params['rest_poses'],
-            tcp_lims=robot_arm_params['tcp_lims']
         )
 
         # connect a static vision sensor
@@ -228,6 +237,11 @@ class VisuoTactileArmEmbodiment(TactileArmEmbodiment):
         self.arm_type = robot_arm_params["type"]
         self.tactile_sensor_type = tactile_sensor_params["type"]
 
+        if "tcp_link_name" in robot_arm_params:
+            self.tcp_link_name = robot_arm_params["tcp_link_name"]
+        else:
+            self.tcp_link_name = "ee_link"
+
         # load the urdf file
         self.load_urdf()
 
@@ -239,14 +253,12 @@ class VisuoTactileArmEmbodiment(TactileArmEmbodiment):
             link_name_to_index=self.link_name_to_index,
             joint_name_to_index=self.joint_name_to_index,
             rest_poses=robot_arm_params['rest_poses'],
-            tcp_lims=robot_arm_params['tcp_lims']
         )
 
         # connect a tactile sensor
         self.tactile_sensor = TactileSensor(
             pb,
             embodiment_id=self.embodiment_id,
-            tcp_link_id=self.tcp_link_id,
             link_name_to_index=self.link_name_to_index,
             joint_name_to_index=self.joint_name_to_index,
             image_size=tactile_sensor_params["image_size"],

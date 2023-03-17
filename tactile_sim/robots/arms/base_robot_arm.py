@@ -11,7 +11,6 @@ class BaseRobotArm:
         link_name_to_index,
         joint_name_to_index,
         rest_poses,
-        tcp_lims
     ):
 
         self._pb = pb
@@ -21,7 +20,6 @@ class BaseRobotArm:
         self.tcp_link_id = tcp_link_id
         self.link_name_to_index = link_name_to_index
         self.joint_name_to_index = joint_name_to_index
-        self.tcp_lims = tcp_lims
 
     def close(self):
         if self._pb.isConnected():
@@ -48,12 +46,6 @@ class BaseRobotArm:
             velocityGains=[self.vel_gain] * self.num_control_dofs,
             forces=np.zeros(self.num_control_dofs) + self.max_force,
         )
-
-    def set_tcp_lims(self, lims):
-        """
-        Used to limit the range of the TCP
-        """
-        self.tcp_lims = lims
 
     def get_current_joint_pos_vel(self):
         """
@@ -121,7 +113,6 @@ class BaseRobotArm:
     def set_target_tcp_pose(self, target_pose):
         """
         Go directly to a tcp position specified relative to the worldframe.
-        - TCP limits are imposed.
         """
 
         # transform from work_frame to world_frame
@@ -158,11 +149,7 @@ class BaseRobotArm:
     def set_target_tcp_velocities(self, target_vels):
         """
         Set desired tcp velocity.
-        - TCP limits are imposed.
         """
-        # check that this won't push the TCP out of limits
-        # zero any velocities that will
-        target_vels = self.check_TCP_vel_lims(np.array(target_vels))
 
         # get current joint positions and velocities
         q, qd = self.get_current_joint_pos_vel()
@@ -209,7 +196,6 @@ class BaseRobotArm:
     def set_target_joint_positions(self, joint_positions):
         """
         Go directly to a specified joint configuration.
-        - Only limits set in URDFs are imposed.
         """
         joint_velocities = np.array([0] * self.num_control_dofs)
 
@@ -231,7 +217,6 @@ class BaseRobotArm:
     def set_target_joint_velocities(self, joint_velocities):
         """
         Set the desired joint velicities.
-        - Only limits set in URDFs are imposed.
         """
         self._pb.setJointMotorControlArray(
             self.embodiment_id,
@@ -368,38 +353,6 @@ class BaseRobotArm:
         self.set_target_joint_velocities(targ_vels)
         self.apply_blocking_velocity_move(blocking_steps=blocking_steps)
 
-    def check_TCP_pos_lims(self, pos, rpy):
-        """
-        cap the pos at the TCP limits specified
-        """
-        pos = np.clip(pos, self.tcp_lims[:3, 0], self.tcp_lims[:3, 1])
-        rpy = np.clip(rpy, self.tcp_lims[3:, 0], self.tcp_lims[3:, 1])
-        return pos, rpy
-
-    def check_TCP_vel_lims(self, vels):
-        """
-        check whether action will take TCP outside of limits,
-        zero any velocities that will.
-        """
-        cur_tcp_pos, cur_tcp_rpy, _, _, _ = self.get_current_TCP_pos_vel()
-
-        # get bool arrays for if limits are exceeded and if velocity is in
-        # the direction that's exceeded
-        exceed_pos_llims = np.logical_and(cur_tcp_pos < self.tcp_lims[:3, 0], vels[:3] < 0)
-        exceed_pos_ulims = np.logical_and(cur_tcp_pos > self.tcp_lims[:3, 1], vels[:3] > 0)
-        exceed_rpy_llims = np.logical_and(cur_tcp_rpy < self.tcp_lims[3:, 0], vels[3:] < 0)
-        exceed_rpy_ulims = np.logical_and(cur_tcp_rpy > self.tcp_lims[3:, 1], vels[3:] > 0)
-
-        # combine all bool arrays into one
-        exceeded_pos = np.logical_or(exceed_pos_llims, exceed_pos_ulims)
-        exceeded_rpy = np.logical_or(exceed_rpy_llims, exceed_rpy_ulims)
-        exceeded = np.concatenate([exceeded_pos, exceeded_rpy])
-
-        # cap the velocities at 0 if limits are exceeded
-        capped_vels = np.array(vels)
-        capped_vels[np.array(exceeded)] = 0
-
-        return capped_vels
     """
     ==================== Debug Tools ====================
     """

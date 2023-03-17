@@ -5,6 +5,8 @@ import cv2
 
 from tactile_sim.assets import add_assets_path
 from tactile_sim.utils.pybullet_draw_utils import draw_link_frame
+from tactile_sim.utils.pybullet_draw_utils import draw_frame
+from tactile_sim.utils.transforms import quat2euler, inv_transform_vec_eul
 
 
 class TactileSensor:
@@ -12,7 +14,6 @@ class TactileSensor:
         self,
         pb,
         embodiment_id,
-        tcp_link_id,
         link_name_to_index,
         joint_name_to_index,
         image_size=[128, 128],
@@ -33,7 +34,6 @@ class TactileSensor:
         self.image_size = image_size
         self.turn_off_border = turn_off_border
         self.sensor_num = sensor_num
-        self.tcp_link_id = tcp_link_id
         self.link_name_to_index = link_name_to_index
         self.joint_name_to_index = joint_name_to_index
 
@@ -215,28 +215,13 @@ class TactileSensor:
         self.camframe_pos, self.camframe_orn = self._pb.multiplyTransforms(
             sensor_body_pos, sensor_body_orn, self.rel_cam_pos, self.rel_cam_orn)
 
-    def camframe_to_worldframe(self, pos, rpy):
-        """
-        Transforms a pose in camera frame to a pose in world frame.
-        """
-        pos = np.array(pos)
-        rpy = np.array(rpy)
-        orn = np.array(self._pb.getQuaternionFromEuler(rpy))
-
-        worldframe_pos, worldframe_orn = self._pb.multiplyTransforms(self.camframe_pos, self.camframe_orn, pos, orn)
-        worldframe_rpy = self._pb.getEulerFromQuaternion(worldframe_orn)
-
-        return np.array(worldframe_pos), np.array(worldframe_rpy)
+        self.camframe = quat2euler(np.concatenate([self.camframe_pos, self.camframe_orn]))
 
     def camvec_to_worldvec(self, camframe_vec):
         """
-        Transforms a vector in work frame to a vector in world frame.
+        Transforms a vector in camera frame to a vector in world frame.
         """
-        camframe_vec = np.array(camframe_vec)
-        rot_matrix = np.array(self._pb.getMatrixFromQuaternion(self.camframe_orn)).reshape(3, 3)
-        worldframe_vec = rot_matrix.dot(camframe_vec)
-
-        return np.array(worldframe_vec)
+        return inv_transform_vec_eul(camframe_vec, self.camframe)
 
     def get_imgs(self):
         """
@@ -360,6 +345,7 @@ class TactileSensor:
         Also plot if enabled.
         """
         img = self.sensor_camera()
+
         # display rendered image
         if not self._render_closed:
             cv2.imshow("tactile_window_{}".format(self.sensor_num), img)
@@ -373,26 +359,7 @@ class TactileSensor:
         return self.process()
 
     def draw_camera_frame(self, lifetime=0.1):
-        rpy = [0, 0, 0]
-
-        self._pb.addUserDebugLine(
-            self.camframe_pos,
-            self.camframe_to_worldframe([0.1, 0, 0], rpy)[0],
-            [1, 0, 0],
-            lifeTime=lifetime,
-        )
-        self._pb.addUserDebugLine(
-            self.camframe_pos,
-            self.camframe_to_worldframe([0, 0.1, 0], rpy)[0],
-            [0, 1, 0],
-            lifeTime=lifetime,
-        )
-        self._pb.addUserDebugLine(
-            self.camframe_pos,
-            self.camframe_to_worldframe([0, 0, 0.1], rpy)[0],
-            [0, 0, 1],
-            lifeTime=lifetime,
-        )
+        draw_frame(self.camframe, lifetime=lifetime)
 
     def draw_sensor_frame(self, lifetime=0.1):
         draw_link_frame(self.embodiment_id, self.tactile_link_ids["body"], lifetime=lifetime)

@@ -1,9 +1,36 @@
+import argparse
 import pybullet as p
 import pybullet_utils.bullet_client as bc
 import pkgutil
 import numpy as np
 
 from tactile_sim.assets import add_assets_path
+
+
+def standard_argparse():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-e', '--embodiment_type',
+        type=str,
+        help="Choose task from ['arm', 'tactile_arm', 'visual_arm', 'visuotactile_arm'].",
+        default='visuotactile_arm'
+    )
+    parser.add_argument(
+        '-a', '--arm_type',
+        type=str,
+        help="Choose task from ['ur5', 'franka_panda', 'kuka_iiwa', 'cr3', 'mg400'].",
+        default='ur5'
+    )
+    parser.add_argument(
+        '-s', '--sensor_type',
+        type=str,
+        help="""Choose task from
+                ['standard_tactip', 'standard_digit', 'standard_digitac', 'mini_tactip', 'flat_tactip',
+                'right_angle_tactip', 'right_angle_digit', 'right_angle_digitac'].""",
+        default='standard_tactip'
+    )
+
+    return parser
 
 
 def connect_pybullet(timestep, show_gui=False):

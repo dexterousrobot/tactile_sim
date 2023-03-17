@@ -1,8 +1,7 @@
 import time
 import numpy as np
-import argparse
 
-
+from tactile_sim.utils.setup_pb_utils import standard_argparse
 from tactile_sim.utils.setup_pb_utils import connect_pybullet
 from tactile_sim.utils.setup_pb_utils import load_standard_environment
 from tactile_sim.utils.setup_pb_utils import set_debug_camera
@@ -17,27 +16,7 @@ def demo_robot_control():
     timestep = 1/240.0
     show_gui = True
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-e', '--embodiment_type',
-        type=str,
-        help="Choose task from ['arm', 'tactile_arm', 'visual_arm', 'visuotactile_arm'].",
-        default='visuotactile_arm'
-    )
-    parser.add_argument(
-        '-a', '--arm_type',
-        type=str,
-        help="Choose task from ['ur5', 'franka_panda', 'kuka_iiwa', 'cr3', 'mg400'].",
-        default='ur5'
-    )
-    parser.add_argument(
-        '-s', '--sensor_type',
-        type=str,
-        help="""Choose task from
-                ['standard_tactip', 'standard_digit', 'standard_digitac', 'mini_tactip', 'flat_tactip',
-                'right_angle_tactip', 'right_angle_digit', 'right_angle_digitac'].""",
-        default='standard_tactip'
-    )
+    parser = standard_argparse()
     parser.add_argument(
         '-c', '--control_mode',
         type=str,
@@ -59,7 +38,6 @@ def demo_robot_control():
     robot_arm_params = {
         "type": arm_type,
         "rest_poses": rest_poses_dict[arm_type],
-        "tcp_lims": np.column_stack([-np.inf * np.ones(6), np.inf * np.ones(6)]),
     }
 
     tactile_sensor_params = {
@@ -139,10 +117,9 @@ def demo_robot_control():
             targ_joint_vels = action
             embodiment.arm.move_joints_vel(targ_joint_vels)
 
-        embodiment.arm.draw_ee()
+        # embodiment.arm.draw_ee()
         # embodiment.arm.draw_tcp()
-        # embodiment.sensor.draw_sensor_frame()
-        # embodiment.sensor.draw_camera_frame()
+        # embodiment.tactile_sensor.draw_camera_frame()
 
         if embodiment_type in ['tactile_arm', 'visuotactile_arm']:
             embodiment.get_tactile_observation()
