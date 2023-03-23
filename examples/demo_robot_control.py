@@ -80,7 +80,7 @@ def demo_robot_control():
             action_ids = add_joint_user_control(pb, embodiment.arm.control_joint_names)
 
     # set initial values
-    targ_tcp_pose = np.array([0.25, 0.0, 0.1, -np.pi, 0.0, 0.0])
+    targ_tcp_pose = np.array([0.35, 0.0, 0.2, -np.pi, 0.0, 0.0])
     targ_tcp_vels = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
     targ_joint_positions = np.array(embodiment.arm.rest_poses[embodiment.arm.control_joint_ids])
     targ_joint_vels = np.array([0.0]*embodiment.arm.num_control_dofs)
@@ -120,6 +120,7 @@ def demo_robot_control():
         # embodiment.arm.draw_ee()
         # embodiment.arm.draw_tcp()
         # embodiment.tactile_sensor.draw_camera_frame()
+        # print(embodiment.arm.get_joint_angles())
 
         if embodiment_type in ['tactile_arm', 'visuotactile_arm']:
             embodiment.get_tactile_observation()

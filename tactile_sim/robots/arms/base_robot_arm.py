@@ -56,7 +56,7 @@ class BaseRobotArm:
         cur_joint_vel = [cur_joint_states[i][1] for i in range(self.num_control_dofs)]
         return cur_joint_pos, cur_joint_vel
 
-    def get_current_TCP_pos_vel(self):
+    def get_current_tcp_pose_vel(self):
         """
         Get the current velocity of the TCP
         """
@@ -69,31 +69,46 @@ class BaseRobotArm:
         tcp_pos = np.array(tcp_state[0])  # worldLinkPos
         tcp_orn = np.array(tcp_state[1])  # worldLinkOrn
         tcp_rpy = self._pb.getEulerFromQuaternion(tcp_orn)
+        tcp_pose = np.array([*tcp_pos, *tcp_rpy])
+
         tcp_lin_vel = np.array(tcp_state[6])  # worldLinkLinearVelocity
         tcp_ang_vel = np.array(tcp_state[7])  # worldLinkAngularVelocity
-        return tcp_pos, tcp_rpy, tcp_orn, tcp_lin_vel, tcp_ang_vel
+        tcp_vel = np.array([*tcp_lin_vel, *tcp_ang_vel])
+
+        return tcp_pose, tcp_vel
 
     def get_tcp_pose(self):
         """
-        Returns pose of the Tool Center Point in world frame
+        Returns pose of the Tool Center Point in world frame.
         """
-        (
-                cur_TCP_pos,
-                cur_TCP_rpy,
-                _,
-                _,
-                _,
-        ) = self.get_current_TCP_pos_vel()
-        return np.array([*cur_TCP_pos, *cur_TCP_rpy])
+        cur_TCP_pose, _ = self.get_current_tcp_pose_vel()
+        return np.array(cur_TCP_pose)
+
+    def get_tcp_vel(self):
+        """
+        Returns velocity of the Tool Center Point in world frame.
+        """
+        _, cur_TCP_vel = self.get_current_tcp_pose_vel()
+        return np.array(cur_TCP_vel)
 
     def get_joint_angles(self):
         """
-        Returns pose of the Tool Center Point in world frame
+        Returns joint positions of the robot arm.
         """
         joint_pos, _ = self.get_current_joint_pos_vel()
         return np.array(joint_pos)
 
+    def get_joint_vel(self):
+        """
+        Returns joint velocities of the robot arm.
+        """
+        _, joint_vel = self.get_current_joint_pos_vel()
+        return np.array(joint_vel)
+
     def compute_gravity_compensation(self):
+        """
+        Calculates torques to apply that compensate for effect of gravity.
+        """
         cur_joint_pos, cur_joint_vel = self.get_current_joint_pos_vel()
         grav_comp_torque = self._pb.calculateInverseDynamics(
             self.embodiment_id, cur_joint_pos, cur_joint_vel, [0] * self.num_control_dofs
@@ -101,6 +116,9 @@ class BaseRobotArm:
         return np.array(grav_comp_torque)
 
     def apply_gravity_compensation(self):
+        """
+        Applys motor torques that compensate for gravity.
+        """
         grav_comp_torque = self.compute_gravity_compensation()
 
         self._pb.setJointMotorControlArray(
@@ -254,15 +272,6 @@ class BaseRobotArm:
         targ_j_pos = self._target_joints_positions
 
         for i in range(max_steps):
-
-            # get the current position and veloicities (worldframe)
-            (
-                cur_TCP_pos,
-                cur_TCP_rpy,
-                cur_TCP_orn,
-                _,
-                _,
-            ) = self.get_current_TCP_pos_vel()
 
             # get the current joint positions and velocities
             cur_j_pos, cur_j_vel = self.get_current_joint_pos_vel()
