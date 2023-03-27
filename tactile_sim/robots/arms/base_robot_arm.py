@@ -1,5 +1,8 @@
 import numpy as np
+import warnings
 from tactile_sim.utils.pybullet_draw_utils import draw_link_frame
+
+warnings.simplefilter('always', UserWarning)
 
 
 class BaseRobotArm:
@@ -311,6 +314,10 @@ class BaseRobotArm:
             # and the velocity is low enough
             if (j_pos_err < j_pos_tol) and (j_vel_err < j_vel_tol):
                 break
+
+        # Warn user is correct pose was not reached within max steps
+        if i == max_steps-1:
+            warnings.warn("Blocking position move failed to reach tolerance within max_steps.")
 
     def blocking_velocity_move(
         self,

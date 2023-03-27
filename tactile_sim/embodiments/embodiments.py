@@ -79,16 +79,14 @@ class ArmEmbodiment:
 
         return num_joints, link_name_to_index, joint_name_to_index
 
-    def reset(self, reset_TCP_pos, reset_TCP_rpy):
+    def reset(self, reset_tcp_pose):
         """
-        Reset the pose of the UR5 and sensor
+        Reset the pose of the arm and sensor
         """
         self.arm.reset()
-        self.sensor.reset()
 
         # move to the initial position
-        self.arm.tcp_direct_workframe_move(reset_TCP_pos, reset_TCP_rpy)
-        self.blocking_move(max_steps=10000, constant_vel=0.001)
+        self.arm.move_linear(reset_tcp_pose, quick_mode=False)
 
     def full_reset(self):
         self.load_urdf()
@@ -171,7 +169,7 @@ class TactileArmEmbodiment(ArmEmbodiment):
         self.tactile_sensor.reset()
 
         # move to the initial position
-        self.arm.move_linear(reset_tcp_pose, quick_mode=True)
+        self.arm.move_linear(reset_tcp_pose, quick_mode=False)
 
     def full_reset(self):
         self.load_urdf()

@@ -1,3 +1,4 @@
+import numpy as np
 import pybullet as p
 from tactile_sim.utils.transforms import inv_transform_eul
 
@@ -80,3 +81,17 @@ def draw_box(workframe, lims):
     p.addUserDebugLine(p2, p3, [1, 0, 0])
     p.addUserDebugLine(p3, p4, [1, 0, 0])
     p.addUserDebugLine(p4, p1, [1, 0, 0])
+
+
+def draw_vector(start_point, vector, line_color=(255, 0, 0)):
+
+    line_width = 2
+    line_life_time = 0.05  # 0 for inf
+
+    line_mag = np.linalg.norm(vector)
+    line_direction = vector
+    line_end_point = start_point + (line_mag * line_direction)
+
+    p.addUserDebugLine(
+        start_point, line_end_point, line_color, line_width, line_life_time
+    )

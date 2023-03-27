@@ -245,7 +245,7 @@
 		<collision>
 			<origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
 			<geometry>
-				<mesh filename="../sensor_assets/flat_tactip/tip/skin.obj" scale="1.00000 1.00000 1.00000"/>
+				<mesh filename="../sensor_assets/flat_tactip/tip/core.obj" scale="1.00000 1.00000 1.00000"/>
 			</geometry>
 		</collision>
 	</link>

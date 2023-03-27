@@ -49,7 +49,7 @@
           <origin rpy="0 0 0" xyz="0 0 0"/>
           <geometry>
               <!-- <cylinder length="0.0065" radius="0.02"/> -->
-              <mesh filename="tip/skin.obj" scale="1.0 1.0 1.0"/>
+              <mesh filename="tip/core.obj" scale="1.0 1.0 1.0"/>
           </geometry>
         </collision>
       </link>
