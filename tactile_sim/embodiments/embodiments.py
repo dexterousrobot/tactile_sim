@@ -86,7 +86,7 @@ class ArmEmbodiment:
         self.arm.reset()
 
         # move to the initial position
-        self.arm.move_linear(reset_tcp_pose, quick_mode=False)
+        self.arm.move_linear(reset_tcp_pose, quick_mode=True)
 
     def full_reset(self):
         self.load_urdf()
@@ -169,7 +169,7 @@ class TactileArmEmbodiment(ArmEmbodiment):
         self.tactile_sensor.reset()
 
         # move to the initial position
-        self.arm.move_linear(reset_tcp_pose, quick_mode=False)
+        self.arm.move_linear(reset_tcp_pose, quick_mode=True)
 
     def full_reset(self):
         self.load_urdf()
