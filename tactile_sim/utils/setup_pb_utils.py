@@ -89,7 +89,7 @@ def load_stim(pb, stim_name, stim_pose, fixed_base=False, scale=1.0):
     stim_pos, stim_rpy = stim_pose[:3], stim_pose[3:]
 
     stim_id = p.loadURDF(
-        add_assets_path(stim_name),  # TODO: fix
+        stim_name,
         stim_pos,
         pb.getQuaternionFromEuler(stim_rpy),
         useFixedBase=fixed_base,
@@ -155,3 +155,12 @@ def add_joint_user_control(pb, control_joints):
         action_ids.append(pb.addUserDebugParameter(joint_name, min_action, max_action, 0))
 
     return action_ids
+
+
+def simple_pb_loop():
+    p.setRealTimeSimulation(1)
+    while p.isConnected():
+        q_key = ord("q")
+        keys = p.getKeyboardEvents()
+        if q_key in keys and keys[q_key] & p.KEY_WAS_TRIGGERED:
+            exit()

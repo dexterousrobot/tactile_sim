@@ -24,6 +24,10 @@ class BaseRobotArm:
         self.link_name_to_index = link_name_to_index
         self.joint_name_to_index = joint_name_to_index
 
+        self._min_constant_vel = 0.0001
+        self._max_constant_vel = 0.001
+        self.set_constant_vel_percentage(percentage=25)
+
     def close(self):
         if self._pb.isConnected():
             self._pb.disconnect()
@@ -260,6 +264,31 @@ class BaseRobotArm:
         # step the simulation
         self._pb.stepSimulation()
 
+    def set_constant_vel_percentage(self, percentage):
+        """
+        Sets constant velocity for position moves as a percentage of maximum.
+        """
+        if percentage == float("inf"):
+            self._constant_vel = None
+            self._max_position_move_steps = 1000
+        else:
+            if percentage < 1 or percentage > 100:
+                raise Exception("Speed value outside range of 1-100%")
+
+            constant_vel_range = self._max_constant_vel - self._min_constant_vel
+            self._constant_vel = self._min_constant_vel + constant_vel_range * (percentage / 100.0)
+            self._max_position_move_steps = 10000
+
+    def get_constant_vel_percentage(self):
+        """
+        Gets constant velocity used for position moves as a percentage of maximum..
+        """
+        if self._constant_vel is None:
+            return float("inf")
+        else:
+            constant_vel_range = self._max_constant_vel - self._min_constant_vel
+            return (self._constant_vel - self._min_constant_vel) / constant_vel_range
+
     def blocking_position_move(
         self,
         max_steps=1000,
@@ -338,8 +367,8 @@ class BaseRobotArm:
         if not quick_mode:
             # slow but more realistic moves
             self.blocking_position_move(
-                max_steps=10000,
-                constant_vel=0.00025,
+                max_steps=self._max_position_move_steps,
+                constant_vel=self._constant_vel,
                 j_pos_tol=1e-6,
                 j_vel_tol=1e-3,
             )
