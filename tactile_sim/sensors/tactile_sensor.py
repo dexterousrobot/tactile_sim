@@ -6,7 +6,7 @@ import cv2
 from tactile_sim.assets import add_assets_path
 from tactile_sim.utils.pybullet_draw_utils import draw_link_frame
 from tactile_sim.utils.pybullet_draw_utils import draw_frame
-from tactile_sim.utils.transforms import quat2euler, inv_transform_vec_eul
+from tactile_sim.utils.transforms import quat2euler, inv_transform_vec_eul, transform_quat
 
 
 class TactileSensor:
@@ -49,6 +49,8 @@ class TactileSensor:
         # self.save_reference_images()
         self.update_cam_frame()
         self.connect()
+        if self.sensor_core == "exp_shear":
+            self.attach_shear_body()
         self.turn_off_collisions()
 
     def turn_off_collisions(self):
@@ -65,8 +67,56 @@ class TactileSensor:
             self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.tactile_link_ids["adapter"], 0, 0)
 
         # turn of "core" collisions
-        if self.sensor_core == "no_core":
+        if self.sensor_core in ["no_core", "exp_shear"]:
             self._pb.setCollisionFilterGroupMask(self.embodiment_id, self.tactile_link_ids["tip"], 0, 0)
+
+    def attach_shear_body(self):
+        """
+        Attach a sphere via spring constraint to allow for movement of core.
+        TODO: Extend to generic mesh for geometry.
+        """
+        shear_body_rad = 0.02
+        constraint_force = 1.0
+
+        sphere_vis = self._pb.createVisualShape(
+            shapeType=self._pb.GEOM_SPHERE,
+            radius=shear_body_rad,
+            rgbaColor=[1.0, 0.0, 0.0, 0.5]
+        )
+        sphere_col = self._pb.createCollisionShape(
+            shapeType=self._pb.GEOM_SPHERE,
+            radius=shear_body_rad
+        )
+
+        tcp_state = self._pb.getLinkState(
+            self.embodiment_id,
+            self.tactile_link_ids['tip'],
+            computeLinkVelocity=False,
+            computeForwardKinematics=False,
+        )
+
+        tcp_pos = np.array(tcp_state[0])
+        tcp_orn = np.array(tcp_state[1])
+
+        self.shear_body_id = self._pb.createMultiBody(
+            baseMass=1e-6,
+            baseCollisionShapeIndex=sphere_col,
+            baseVisualShapeIndex=sphere_vis,
+            basePosition=tcp_pos,
+            baseOrientation=tcp_orn,
+            useMaximalCoordinates=True
+        )
+
+        self.shear_body_cid = self._pb.createConstraint(
+            self.embodiment_id, self.tactile_link_ids['tip'],
+            self.shear_body_id, -1,
+            self._pb.JOINT_FIXED,
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
+        )
+
+        self._pb.changeConstraint(self.shear_body_cid, maxForce=constraint_force)
 
     def load_reference_images(self):
         # get saved reference images
@@ -266,6 +316,31 @@ class TactileSensor:
 
         return rgb, dep, mask
 
+    def get_shear_force(self):
+        """
+        Compute a proxy shear deformation from shead body position.
+        """
+        # tip pose
+        tip_state = self._pb.getLinkState(
+            self.embodiment_id,
+            self.tactile_link_ids['tip'],
+            computeLinkVelocity=False,
+            computeForwardKinematics=False,
+        )
+
+        tip_pos = np.array(tip_state[0])
+        tip_orn = np.array(tip_state[1])
+
+        # shear body pose
+        shear_body_pos, shear_body_orn = self._pb.getBasePositionAndOrientation(self.shear_body_id)
+
+        # calculate shear body pose in tip frame to get delta
+        tip_pose = np.concatenate((tip_pos, tip_orn))
+        shear_body_pose = np.concatenate((shear_body_pos, shear_body_orn))
+        pose_deltas = quat2euler(transform_quat(tip_pose, shear_body_pose))
+
+        return pose_deltas
+
     def sensor_camera(self):
         """
         Pull some images from the synthetic camera and manipulate them to become
@@ -299,7 +374,36 @@ class TactileSensor:
         if not self.turn_off_border:
             pen_img[self.border_mask == 1] = self.no_deformation_gray[self.border_mask == 1]
 
-        return pen_img
+        if self.sensor_core == "exp_shear":
+            # add color dependent on shear
+            pose_deltas = self.get_shear_force()
+            x_diff, y_diff = pose_deltas[3], pose_deltas[5]
+
+            # # norm -1, 1
+            x_llim, x_ulim = -0.25, 0.25
+            y_llim, y_ulim = -0.25, 0.25
+            x_diff = np.clip(x_diff, x_llim, x_ulim)
+            y_diff = np.clip(y_diff, y_llim, y_ulim)
+            x_diff = (((x_diff - x_llim) / (x_ulim - x_llim)) * 2) - 1
+            y_diff = (((y_diff - y_llim) / (y_ulim - y_llim)) * 2) - 1
+
+            # convert to polar coords
+            mag = np.sqrt(x_diff**2 + y_diff**2)
+            ang = np.arctan2(y_diff, x_diff)
+            if ang < 0:
+                ang += 2*np.pi
+
+            hsv = np.zeros(shape=(*pen_img.shape, 3), dtype=np.uint8)
+            hsv[self.border_mask != 1, 0] = (ang / 2) * 255
+            hsv[self.border_mask != 1, 1] = mag * 255
+            hsv[..., 2] = pen_img
+
+            bgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+
+            return bgr
+
+        else:
+            return pen_img
 
     def connect(self):
         """
@@ -324,10 +428,7 @@ class TactileSensor:
         Reset the sensor core parameters here, could perform physics
         randomisations if required.
         """
-        if self.sensor_core == "no_core":
-            return None
-
-        elif self.sensor_core == "fixed":
+        if self.sensor_core == "fixed":
             # change dynamics
             self._pb.changeDynamics(
                 self.embodiment_id,

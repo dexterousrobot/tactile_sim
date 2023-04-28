@@ -42,11 +42,11 @@ def demo_robot_control():
 
     tactile_sensor_params = {
         "type": sensor_type,
-        "core": "fixed",
+        "core": "exp_shear",
         "dynamics": {},  # {'stiffness': 50, 'damping': 100, 'friction': 10.0},
         "image_size": [128, 128],
         "turn_off_border": False,
-        "show_tactile": False,
+        "show_tactile": True,
     }
 
     # set debug camera position
@@ -133,9 +133,12 @@ def demo_robot_control():
         time.sleep(timestep)
 
         q_key = ord("q")
+        r_key = ord("r")
         keys = pb.getKeyboardEvents()
         if q_key in keys and keys[q_key] & pb.KEY_WAS_TRIGGERED:
             exit()
+        if r_key in keys and keys[r_key] & pb.KEY_WAS_TRIGGERED:
+            embodiment.reset(targ_tcp_pose)
 
 
 if __name__ == "__main__":
