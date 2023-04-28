@@ -355,6 +355,36 @@ class TactileSensor:
 
         return img
 
+    def get_contact_features(self):
+        self._pb.getContactPoints()
+        contact_points = self._pb.getContactPoints(
+            bodyA=self.embodiment_id,
+            linkIndexA=self.tactile_link_ids['tip'],
+        )
+        if not contact_points:
+            return None
+
+        contact_features = []
+        for contact in contact_points:
+            contact_feature_names = [
+                'contact_flag',
+                'body_A_id',
+                'body_B_id',
+                'link_A_id',
+                'link_B_id',
+                'position_on_A',
+                'position_on_B',
+                'contact_normal_on_B',
+                'contact_distance',
+                'normal_force',
+                'lateral_friction_1',
+                'lateral_friction_dir_1',
+                'lateral_friction_2',
+                'lateral_friction_dir_2',
+            ]
+            contact_features.append(dict(zip(contact_feature_names, contact)))
+        return contact_features
+
     def get_observation(self):
         return self.process()
 

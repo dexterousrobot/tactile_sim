@@ -22,7 +22,7 @@ def demo_robot_control():
         type=str,
         help="""Choose task from
                 ['tcp_position_control', 'tcp_velocity_control', 'joint_position_control', 'joint_velocity_control'].""",
-        default='tcp_position_control'
+        default='tcp_velocity_control'
     )
     args = parser.parse_args()
     embodiment_type = args.embodiment_type
@@ -42,7 +42,7 @@ def demo_robot_control():
 
     tactile_sensor_params = {
         "type": sensor_type,
-        "core": "no_core",
+        "core": "fixed",
         "dynamics": {},  # {'stiffness': 50, 'damping': 100, 'friction': 10.0},
         "image_size": [128, 128],
         "turn_off_border": False,
@@ -120,6 +120,7 @@ def demo_robot_control():
         # embodiment.arm.draw_ee()
         # embodiment.arm.draw_tcp()
         # embodiment.tactile_sensor.draw_camera_frame()
+        # print(embodiment.tactile_sensor.get_contact_features())
         # print(embodiment.arm.get_joint_angles())
 
         if embodiment_type in ['tactile_arm', 'visuotactile_arm']:
