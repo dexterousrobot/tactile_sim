@@ -143,16 +143,7 @@ class BaseRobotArm:
         target_orn = np.array(self._pb.getQuaternionFromEuler(target_rpy))
 
         # get target joint poses through IK
-        joint_positions = self._pb.calculateInverseKinematics(
-            self.embodiment_id,
-            self.tcp_link_id,
-            target_pos,
-            target_orn,
-            restPoses=self.rest_poses,
-            maxNumIterations=100,
-            residualThreshold=1e-8,
-        )
-        joint_positions = self._process_ik_joint_positions(joint_positions)
+        joint_positions = self.accurate_inverse_kinematics(target_pos, target_orn)
         joint_velocities = np.array([0] * self.num_control_dofs)
 
         # set joint control
@@ -169,6 +160,39 @@ class BaseRobotArm:
 
         # set target positions for blocking move
         self._target_joints_positions = np.array(joint_positions)
+
+    def accurate_inverse_kinematics(self, target_pos, target_orn, pos_tol=1e-6, max_solves=10):
+        """
+        Joint positions that put the TCP at target_pos (worldframe, m) and target_orn.
+
+        One IK solve, seeded with the current joints, stops short of the target (by up to
+        millimetres after a long move), so solve repeatedly, seeding each solve with the last
+        solution adapted to the arm's joint constraints (_process_ik_joint_positions), until
+        the TCP is within pos_tol. The joints are moved only to evaluate each solution, and
+        restored, with their velocities, before returning.
+        """
+        saved = [self._pb.getJointState(self.embodiment_id, j)[:2] for j in self.control_joint_ids]
+        try:
+            for _ in range(max_solves):
+                joint_positions = self._process_ik_joint_positions(self._pb.calculateInverseKinematics(
+                    self.embodiment_id,
+                    self.tcp_link_id,
+                    target_pos,
+                    target_orn,
+                    restPoses=self.rest_poses,
+                    maxNumIterations=100,
+                    residualThreshold=1e-8,
+                ))
+                for joint_id, position in zip(self.control_joint_ids, joint_positions):
+                    self._pb.resetJointState(self.embodiment_id, joint_id, position)
+                tcp_pos = self._pb.getLinkState(
+                    self.embodiment_id, self.tcp_link_id, computeForwardKinematics=True)[4]
+                if np.linalg.norm(np.array(tcp_pos) - np.array(target_pos)) < pos_tol:
+                    break
+        finally:
+            for joint_id, (position, velocity) in zip(self.control_joint_ids, saved):
+                self._pb.resetJointState(self.embodiment_id, joint_id, position, velocity)
+        return joint_positions
 
     def _process_ik_joint_positions(self, joint_positions):
         """Adapt a generic IK solution to an arm's joint constraints."""

@@ -74,12 +74,14 @@ class MG400(BaseRobotArm):
         return control_joint_angles
 
     def _process_ik_joint_positions(self, joint_positions):
-        """Unwrap J1 and enforce parallel-link coupling on an IK solution."""
+        """Unwrap J1 and enforce the parallel-link coupling, which keeps the flange level,
+        on an IK solution."""
         joint_positions = np.asarray(joint_positions, dtype=float).copy()
         current_j1 = super().get_joint_angles()[0]
         joint_positions[0] += 2 * np.pi * np.round(
             (current_j1 - joint_positions[0]) / (2 * np.pi)
         )
+        joint_positions[3] = -(joint_positions[1] + joint_positions[2])  # j4_1: level flange.
         joint_positions[5] = joint_positions[1]
         joint_positions[6] = -joint_positions[1]
         joint_positions[7] = joint_positions[1] + joint_positions[2]
@@ -190,15 +192,7 @@ class MG400(BaseRobotArm):
         target_orn = self._pb.getQuaternionFromEuler(target_rpy)
 
         # get joint positions using inverse kinematics
-        joint_poses = self._pb.calculateInverseKinematics(
-            self.embodiment_id,
-            self.tcp_link_id,
-            target_pos,
-            target_orn,
-            restPoses=self.rest_poses,
-            maxNumIterations=100,
-            residualThreshold=1e-8,
-        )
+        joint_poses = self.accurate_inverse_kinematics(target_pos, target_orn)
 
         if self.robot_type == "MG400":
             joint_poses = list(joint_poses)
@@ -235,15 +229,7 @@ class MG400(BaseRobotArm):
         target_orn = np.array(self._pb.getQuaternionFromEuler(target_rpy))
 
         # get target joint poses through IK
-        joint_poses = self._pb.calculateInverseKinematics(
-            self.embodiment_id,
-            self.tcp_link_id,
-            target_pos,
-            target_orn,
-            restPoses=self.rest_poses,
-            maxNumIterations=100,
-            residualThreshold=1e-8,
-        )
+        joint_poses = self.accurate_inverse_kinematics(target_pos, target_orn)
         # set joint control
         self._pb.setJointMotorControlArray(
             self.embodiment_id,
