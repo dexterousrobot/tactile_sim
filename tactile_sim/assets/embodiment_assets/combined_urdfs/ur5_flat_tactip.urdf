@@ -163,7 +163,7 @@
 	</link>
 	<link name="ee_link">
 		<inertial>
-			<origin rpy="-3.14000 -0.00000 1.57000" xyz="0.00000 0.00000 0.00000"/>
+			<origin rpy="-3.141592653589793 -0.00000 1.5707963267948966" xyz="0.00000 0.00000 0.00000"/>
 			<mass value="0.00000"/>
 			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
 		</inertial>
@@ -229,7 +229,7 @@
 	</link>
 	<link name="tcp_link">
 		<inertial>
-			<origin rpy="0.00000 -0.00000 1.57000" xyz="0.00000 0.00000 0.00000"/>
+			<origin rpy="0.00000 -0.00000 1.5707963267948966" xyz="0.00000 0.00000 0.00000"/>
 			<mass value="0.00000"/>
 			<inertia ixx="0.00000" ixy="0" ixz="0" iyy="0.00000" iyz="0" izz="0.00000"/>
 		</inertial>
